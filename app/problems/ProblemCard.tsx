@@ -2,9 +2,32 @@
 
 import { Problem } from "./index";
 
-export default function ProblemCard({ problem }: { problem: Problem }) {
+export default function ProblemCard({
+  problem,
+  done,
+}: {
+  problem: Problem;
+  done?: boolean;
+}) {
   return (
-    <div className="p-5 bg-white/5 border border-white/10 rounded-xl hover:border-teal-400/40 transition cursor-pointer backdrop-blur-md">
+    <div className="relative p-5 bg-white/5 border border-white/10 rounded-xl hover:border-teal-400/40 transition cursor-pointer backdrop-blur-md">
+      {/* Done badge */}
+      {done && (
+        <div className="absolute top-3 right-3 flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-300">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-3.5 w-3.5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="3"
+          >
+            <path d="M20 6L9 17l-5-5" />
+          </svg>
+          Done
+        </div>
+      )}
+
       <span
         className={`text-sm font-semibold ${
           problem.difficulty === "Easy"
