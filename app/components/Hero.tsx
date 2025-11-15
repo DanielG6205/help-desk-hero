@@ -24,7 +24,7 @@ export default function Hero() {
 
       {/* Hero content */}
       <div className="relative z-10 flex h-full flex-col items-center justify-center text-center px-4 text-white">
-        <h1 className="text-6xl font-extrabold tracking-wide drop-shadow-lg bg-gradient-to-r from-teal-300 via-cyan-400 to-blue-500 text-transparent bg-clip-text">
+        <h1 className="text-6xl font-extrabold tracking-wide drop-shadow-lg bg-blue-400 text-transparent bg-clip-text">
           HelpDeskHero
         </h1>
 

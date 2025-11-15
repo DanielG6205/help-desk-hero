@@ -6,13 +6,11 @@ import { motion } from "framer-motion";
 export default function Info() {
   return (
     <div className="w-full flex flex-col gap-24 px-10 py-24 bg-black text-white">
-
-      {/* ---- Title: Practice [topics] ---- */}
+      {/* ---- Title ---- */}
       <div className="text-center text-5xl font-extrabold">
-        <span className="bg-gradient-to-r from-teal-300 to-blue-400 text-transparent bg-clip-text">
+        <span className="bg-cyan-300 text-transparent bg-clip-text">
           Practice{" "}
         </span>
-
         <TypeAnimation
           sequence={[
             "Troubleshooting!",
@@ -33,45 +31,49 @@ export default function Info() {
         />
       </div>
 
-      {/* ---- Practice Section ---- */}
-      <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-12 bg-white/5 border border-white/10 p-8 rounded-2xl backdrop-blur-md shadow-lg">
-        <img
-          src="/practice-placeholder.png"
-          alt="Practice Problem"
-          className="w-full h-auto rounded-xl shadow-lg"
-        />
+      {/* ---- Unified 2x2 Grid Box ---- */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 grid-rows-2 gap-0 bg-white/5 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-md shadow-lg hover:border-teal-400/40 transition-all duration-300">
+        {/* Top Left — Practice Image */}
+        <div className="flex items-center justify-center bg-white/10 p-6">
+          <img
+            src="/practice-placeholder.png"
+            alt="Practice Help Desk Scenarios"
+            className="w-full h-auto rounded-xl shadow-lg"
+          />
+        </div>
 
-        <div className="flex flex-col gap-4">
-          <h2 className="text-4xl font-bold bg-gradient-to-r from-teal-300 to-blue-400 text-transparent bg-clip-text">
+        {/* Top Right — Practice Text */}
+        <div className="flex flex-col justify-center p-10 text-center lg:text-left">
+          <h2 className="text-4xl font-bold bg-teal-300 text-transparent bg-clip-text mb-4">
             Practice
           </h2>
           <p className="text-gray-300 text-lg leading-relaxed">
-            Solve realistic help desk scenarios built to help you master
-            troubleshooting, user support, and diagnostic workflows.
+            Solve realistic help desk problems that sharpen your ability to
+            troubleshoot, diagnose issues, and communicate solutions clearly.
+            Build confidence through hands-on scenarios.
           </p>
         </div>
-      </div>
 
-      {/* ---- Learn Section ---- */}
-      <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-12 bg-white/5 border border-white/10 p-8 rounded-2xl backdrop-blur-md shadow-lg">
-        
-        {/* Text LEFT for Learn */}
-        <div className="flex flex-col gap-4 order-2 md:order-1">
-          <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-teal-300 text-transparent bg-clip-text">
+        {/* Bottom Left — Learn Text */}
+        <div className="flex flex-col justify-center p-10 text-center lg:text-left">
+          <h2 className="text-4xl font-bold bg-teal-300 text-transparent bg-clip-text mb-4">
             Learn
           </h2>
           <p className="text-gray-300 text-lg leading-relaxed">
-            Explore well-structured articles that teach core concepts, workflows,
-            system knowledge, and industry-standard help desk practices.
+            Deepen your understanding with structured articles that teach IT
+            fundamentals, service workflows, and industry best practices for
+            effective support.
           </p>
         </div>
 
-        {/* Image RIGHT */}
-        <img
-          src="/learn-placeholder.png"
-          alt="Learning Article"
-          className="w-full h-auto rounded-xl shadow-lg order-1 md:order-2"
-        />
+        {/* Bottom Right — Learn Image */}
+        <div className="flex items-center justify-center bg-white/10 p-6">
+          <img
+            src="/learn-placeholder.png"
+            alt="Learn Help Desk Skills"
+            className="w-full h-auto rounded-xl shadow-lg"
+          />
+        </div>
       </div>
     </div>
   );
