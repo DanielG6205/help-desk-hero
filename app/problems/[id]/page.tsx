@@ -1,8 +1,17 @@
 import { problems } from "../index";
 import { notFound } from "next/navigation";
 
-export default function ProblemDetail({ params }: { params: { id: string } }) {
-  const problem = problems.find((p) => p.id === Number(params.id));
+type PageParams = {
+  id: string;
+};
+
+export default async function ProblemDetail({
+  params,
+}: {
+  params: Promise<PageParams>;
+}) {
+  const { id } = await params;
+  const problem = problems.find((p) => p.id === Number(id));
   if (!problem) return notFound();
 
   return (
