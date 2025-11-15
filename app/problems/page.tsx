@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import ProblemCard from "./ProblemCard";
 import { problems } from "./index";
+import { useCompletion } from "./lib/useCompletion";
 
-const difficulties = ["Easy", "Medium", "Hard"];
+const difficulties = ["Easy", "Medium", "Hard"] as const;
 const skillsList = [
   "Active Directory",
   "Networking",
@@ -16,11 +17,16 @@ const skillsList = [
   "Diagnostics",
   "Mobile Device Support",
   "System Cleanup",
-];
+] as const;
+
+type StatusFilter = "all" | "done" | "not_done";
 
 export default function ProblemsPage() {
   const [selectedDifficulty, setSelectedDifficulty] = useState<string[]>([]);
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
+  const [status, setStatus] = useState<StatusFilter>("all");
+
+  const { isDone, doneIds } = useCompletion();
 
   const toggleFilter = (filter: string, setter: any, current: string[]) => {
     setter(
@@ -30,23 +36,73 @@ export default function ProblemsPage() {
     );
   };
 
-  const filteredProblems = problems.filter((p) => {
-    const diffOk =
-      selectedDifficulty.length === 0 ||
-      selectedDifficulty.includes(p.difficulty);
-    const skillsOk =
-      selectedSkills.length === 0 ||
-      selectedSkills.every((skill) => p.skills.includes(skill));
-    return diffOk && skillsOk;
-  });
+  const counts = useMemo(() => {
+    const done = problems.filter((p) => isDone(p.id)).length;
+    return { done, not: problems.length - done, all: problems.length };
+  }, [isDone]);
+
+  const filteredProblems = useMemo(() => {
+    return problems.filter((p) => {
+      const diffOk =
+        selectedDifficulty.length === 0 ||
+        selectedDifficulty.includes(p.difficulty);
+      const skillsOk =
+        selectedSkills.length === 0 ||
+        selectedSkills.every((skill) => p.skills.includes(skill));
+      const statusOk =
+        status === "all" ||
+        (status === "done" && isDone(p.id)) ||
+        (status === "not_done" && !isDone(p.id));
+      return diffOk && skillsOk && statusOk;
+    });
+  }, [selectedDifficulty, selectedSkills, status, isDone]);
 
   return (
     <div className="flex min-h-screen pt-24 px-6 bg-black text-white">
-      <aside className="w-64 bg-white/5 border border-white/10 rounded-xl p-6 backdrop-blur-md h-fit sticky top-28">
+      <aside className="w-72 bg-white/5 border border-white/10 rounded-xl p-6 backdrop-blur-md h-fit sticky top-28">
         <h2 className="text-xl font-semibold mb-4 bg-gradient-to-r from-teal-300 to-blue-400 text-transparent bg-clip-text">
           Filters
         </h2>
 
+        {/* Status */}
+        <div className="mb-6">
+          <h3 className="text-teal-300 font-medium mb-2">Status</h3>
+          <div className="space-y-2">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="status"
+                className="accent-teal-400"
+                checked={status === "all"}
+                onChange={() => setStatus("all")}
+              />
+              All <span className="text-xs text-gray-400 ml-auto">{counts.all}</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="status"
+                className="accent-teal-400"
+                checked={status === "done"}
+                onChange={() => setStatus("done")}
+              />
+              Done <span className="text-xs text-gray-400 ml-auto">{counts.done}</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name="status"
+                className="accent-teal-400"
+                checked={status === "not_done"}
+                onChange={() => setStatus("not_done")}
+              />
+              Not Done{" "}
+              <span className="text-xs text-gray-400 ml-auto">{counts.not}</span>
+            </label>
+          </div>
+        </div>
+
+        {/* Difficulty */}
         <div className="mb-6">
           <h3 className="text-teal-300 font-medium mb-2">Difficulty</h3>
           {difficulties.map((d) => (
@@ -64,6 +120,7 @@ export default function ProblemsPage() {
           ))}
         </div>
 
+        {/* Skills */}
         <h3 className="text-teal-300 font-medium mb-2">Skills</h3>
         {skillsList.map((skill) => (
           <label key={skill} className="flex items-center gap-2 cursor-pointer">
@@ -88,7 +145,10 @@ export default function ProblemsPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {filteredProblems.map((problem) => (
             <Link href={`/problems/${problem.id}`} key={problem.id}>
-              <ProblemCard problem={problem} />
+              <ProblemCard
+                problem={problem}
+                done={doneIds.has(problem.id)}
+              />
             </Link>
           ))}
         </div>
