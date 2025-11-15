@@ -50,7 +50,7 @@ export default function LearnPage() {
     <div className="min-h-screen bg-black text-white pt-24 px-6">
       {/* Page Header */}
       <div className="text-center mb-16">
-        <h1 className="text-5xl font-extrabold bg-gradient-to-r from-teal-300 to-blue-400 text-transparent bg-clip-text">
+        <h1 className="text-5xl font-extrabold bg-blue-400 text-transparent bg-clip-text">
           Learn Help Desk Skills
         </h1>
         <p className="text-gray-300 text-lg mt-4 max-w-2xl mx-auto">
