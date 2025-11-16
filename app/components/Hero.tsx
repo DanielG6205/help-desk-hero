@@ -247,7 +247,7 @@ export default function Hero() {
                   Learn concepts
                 </button>
                 <Link
-                  href="/problems"
+                  href="/labs"
                   className="px-8 py-3 rounded-xl font-semibold text-black bg-teal-300 hover:bg-teal-400 hover:shadow-[0_0_18px_#14b8a6] transition-all duration-200"
                   aria-label="Start Practicing"
                 >
