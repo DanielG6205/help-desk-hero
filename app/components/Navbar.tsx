@@ -26,7 +26,10 @@ export default function Navbar() {
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node)
+      ) {
         setOpen(false);
       }
     }
@@ -37,20 +40,17 @@ export default function Navbar() {
   return (
     <nav className="fixed top-0 py-2 left-0 w-full z-30 bg-white/10 backdrop-blur-lg border-b border-white/20">
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-
         {/* Logo */}
         <Link href="/" className="block">
           <img
-            src="/logo.png"
+            src="/help-logo.svg"
             alt="HelpDeskHero Logo"
             className="h-14 w-auto"
           />
         </Link>
 
-
         {/* Desktop Links + Auth */}
         <div className="hidden md:flex gap-10 text-gray-200 items-center">
-
           {/* Page Links */}
           {["Leaderboard", "Problems", "About", "Learn"].map((item) => (
             <Link
@@ -66,7 +66,7 @@ export default function Navbar() {
           {!user ? (
             <Link
               href="/login"
-              className="px-4 py-2 rounded-lg bg-teal-400 text-black font-semibold 
+              className="px-4 py-2 rounded-lg bg-teal-400 text-black font-semibold
                          hover:bg-teal-300 hover:shadow-[0_0_12px_#14b8a6] transition-all"
             >
               Login
@@ -75,7 +75,7 @@ export default function Navbar() {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setOpen(!open)}
-                className="px-4 py-2 rounded-lg bg-teal-400 text-black font-semibold 
+                className="px-4 py-2 rounded-lg bg-teal-400 text-black font-semibold
                            hover:bg-teal-300 hover:shadow-[0_0_12px_#14b8a6] transition-all"
               >
                 Hi, {getFirstName()}
@@ -84,7 +84,7 @@ export default function Navbar() {
               {/* Dropdown */}
               {open && (
                 <div
-                  className="absolute right-0 mt-2 w-40 bg-white text-black rounded-xl shadow-xl 
+                  className="absolute right-0 mt-2 w-40 bg-white text-black rounded-xl shadow-xl
                              border border-gray-200 overflow-hidden animate-fadeIn"
                 >
                   <Link

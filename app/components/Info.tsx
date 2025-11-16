@@ -5,7 +5,7 @@ import Image from "next/image";
 
 export default function Info() {
   return (
-    <section className="relative w-full bg-black text-white">
+    <section className="relative w-full bg-black text-white h-full">
       <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-16 px-10 py-24 lg:flex-row lg:items-stretch lg:gap-20 lg:px-24 lg:py-32">
         <div className="flex w-full flex-col gap-10 lg:w-1/2">
           <div className="space-y-6">
