@@ -14,10 +14,12 @@ export function usePremium() {
       return;
     }
 
-    const uid = user.uid;
-
     async function load() {
-      const ref = doc(db, "users", uid);
+    if (!user || !user.uid) {
+        console.error("User not logged in — cannot create Firestore doc ref.");
+        return;
+      }
+      const ref = doc(db, "users", user.uid);
       const snap = await getDoc(ref);
 
       if (snap.exists()) {
