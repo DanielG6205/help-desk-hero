@@ -14,7 +14,7 @@ export default function Home() {
   return (
     <div className="w-full min-h-screen bg-black font-sans">
       <Hero />
-      <div className="w-full">
+      <div className="w-full h-full bg-black">
         <Info />
       </div>
     </div>
