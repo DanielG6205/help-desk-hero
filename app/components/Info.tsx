@@ -22,7 +22,7 @@ export default function Info() {
             "Customer Support!",
             2000,
             "Help Desk!",
-            2000,
+            4000,
           ]}
           wrapper="span"
           cursor={true}

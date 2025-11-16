@@ -1,69 +1,230 @@
-// Hero.tsx
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
+/**
+ * Scroll‑linked Hero section.
+ *
+ * Effects:
+ * - First two lines ("Practice helpdesk work. Troubleshoot real computers.") fade + blur out as user scrolls.
+ * - Supporting paragraph fades + blurs out in sync with them.
+ * - "Be a Hero" stays pinned (via sticky) and moves slightly (subtle translate) until end of hero section.
+ * - Tagline + buttons move upward (parallax) while divider line remains visually stable.
+ * - Animation progress clamps 0 → 1 over the scrollable portion (hero height - viewport height).
+ * - Respects prefers-reduced-motion (disables transitions / blurs).
+ */
 export default function Hero() {
+  const heroRef = useRef<HTMLElement | null>(null);
+  const [progress, setProgress] = useState(0); // 0 → 1 normalized
+  // Detect reduced motion preference (evaluated client-side each render)
+  const reduceMotion =
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  useEffect(() => {
+    // (Removed reduced motion ref assignment; now computed directly in render)
+
+    function computeProgress() {
+      if (!heroRef.current) return 0;
+      const el = heroRef.current;
+      const heroTop = el.offsetTop;
+      const heroHeight = el.offsetHeight;
+      const viewportHeight = window.innerHeight;
+      const scrollY = window.scrollY;
+      // Portion where sticky is active: heroHeight - viewportHeight
+      const scrollable = Math.max(heroHeight - viewportHeight, 1);
+      const raw = (scrollY - heroTop) / scrollable;
+      return Math.min(1, Math.max(0, raw));
+    }
+
+    let ticking = false;
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const p = computeProgress();
+        setProgress(p);
+        ticking = false;
+      });
+    }
+
+    function onResize() {
+      // Trigger recalculation after layout changes
+      onScroll();
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onResize);
+    // Initial set
+    onScroll();
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
+    };
+  }, []);
+
+  // Derived animation values
+  const fadeOut = 1 - progress * 1.15; // Can go below 0; clamp in styles
+  const blurAmount = progress * 8; // px
+  const heroDrift = progress * 32; // px downward movement for "Be a Hero"
+  const miniSectionDrift = progress; // px downward movement for mini-section
+  const parallaxRise = progress * 60; // px upward movement for tagline/buttons
+  const dividerOpacity = 1 - progress * 0.25; // Keep strong but slight dim near end
+
+  // Clamp helpers
+  const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
+
+  const headingStyle: React.CSSProperties = reduceMotion
+    ? {}
+    : {
+        opacity: clamp01(fadeOut),
+        filter: `blur(${blurAmount.toFixed(2)}px)`,
+        transform: `translateY(${(progress * 25).toFixed(2)}px)`,
+      };
+
+  const paragraphStyle: React.CSSProperties = reduceMotion
+    ? {}
+    : {
+        opacity: clamp01(fadeOut),
+        filter: `blur(${blurAmount.toFixed(2)}px)`,
+        transform: `translateY(${(progress * 20).toFixed(2)}px)`,
+      };
+
+  const pinnedHeroStyle: React.CSSProperties = reduceMotion
+    ? {}
+    : {
+        transform: `translateY(${heroDrift.toFixed(2)}px)`,
+      };
+
+  const miniSectionStyle: React.CSSProperties = reduceMotion
+    ? {}
+    : {
+        transform: `translateY(${miniSectionDrift.toFixed(2)}px)`,
+      };
+
+  const parallaxGroupStyle: React.CSSProperties = reduceMotion
+    ? {}
+    : {
+        transform: `translateY(${(-parallaxRise).toFixed(2)}px)`,
+      };
+
   return (
-    <section className="relative h-screen w-full overflow-hidden">
+    <section
+      ref={heroRef}
+      className="relative w-full h-[170vh] bg-black text-white overflow-visible"
+      aria-label="Hero Section"
+    >
       {/* Background Image */}
       <div
-        className="absolute inset-0 bg-cover bg-center"
+        className="absolute inset-0 bg-cover bg-center will-change-transform"
         style={{
           backgroundImage:
-            "url('https://images.unsplash.com/photo-1635776062360-af423602aff3?q=80&w=3432&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')",
+            "url('https://images.unsplash.com/photo-1635776062360-af423602aff3?q=80&w=3432&auto=format&fit=crop')",
+          filter: "brightness(0.75)",
         }}
       />
 
-      {/* Dark gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-black/80" />
+      {/* Layered overlays */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/70 to-black/85 pointer-events-none" />
+      <div className="absolute inset-0 opacity-[0.07] bg-[linear-gradient(to_right,#fff_1px,transparent_1px),linear-gradient(to_bottom,#fff_1px,transparent_1px),linear-gradient(to_right,#fff_2px,transparent_2px),linear-gradient(to_bottom,#fff_2px,transparent_2px)] bg-[size:40px_40px,40px_40px,160px_160px,160px_160px] pointer-events-none" />
 
-      {/* Tech grid overlay */}
-      <div className="absolute inset-0 opacity-[0.07] bg-[linear-gradient(to_right,#fff_1px,transparent_1px),linear-gradient(to_bottom,#fff_1px,transparent_1px),linear-gradient(to_right,#fff_2px,transparent_2px),linear-gradient(to_bottom,#fff_2px,transparent_2px)] bg-[size:40px_40px,40px_40px,160px_160px,160px_160px]" />
+      {/* Sticky viewport frame */}
+      <div
+        className="sticky top-0 h-screen flex flex-col justify-center px-10 md:px-24 lg:px-32 transition-[transform] duration-300"
+        style={miniSectionStyle}
+      >
+        {/* Headings block */}
+        <div className="w-full">
+          <h1
+            className="text-6xl md:text-7xl font-extrabold tracking-tight drop-shadow-lg leading-[1.08] transition-[opacity,transform,filter] duration-300"
+            style={headingStyle}
+          >
+            Practice helpdesk work.
+          </h1>
+          <h1
+            className="text-6xl md:text-7xl font-extrabold tracking-tight drop-shadow-lg leading-[1.08] mt-2 transition-[opacity,transform,filter] duration-300"
+            style={headingStyle}
+          >
+            Troubleshoot real computers.
+          </h1>
+          <h1
+            className="text-6xl md:text-7xl font-extrabold tracking-tight drop-shadow-lg leading-[1.08] mt-4 will-change-transform transition-transform duration-300"
+            style={pinnedHeroStyle}
+          >
+            Be a{" "}
+            <span className="inline-block bg-gradient-to-r from-teal-300 via-cyan-400 to-blue-400 text-transparent bg-clip-text animate-gradient-x bg-[length:200%_auto]">
+              Hero
+            </span>
+          </h1>
 
-      {/* Hero content */}
-      <div className="relative z-10 flex h-full flex-col items-start justify-center text-left px-34 text-white">
-        <h1 className="text-7xl font-extrabold tracking-wide drop-shadow-lg text-white">
-          Practice helpdesk work.
-        </h1>
-        <h1 className="text-7xl font-extrabold tracking-wide drop-shadow-lg text-white mt-2">
-          Troubleshoot real computers.
-        </h1>
-        <h1 className="text-7xl font-extrabold tracking-wide drop-shadow-lg mt-2">
-          Be a{" "}
-          <span className="inline-block bg-gradient-to-r from-teal-300 via-cyan-400 to-blue-400 text-transparent bg-clip-text animate-gradient-x bg-[length:200%_auto]">
-            Hero
-          </span>
-        </h1>
+          {/* Divider + secondary content (divider remains visually centered) */}
+          <div
+            className="mt-10 w-full border-t border-white/70 transition-opacity duration-300"
+            style={{ opacity: clamp01(dividerOpacity) }}
+          />
+        </div>
 
-        {/* Sub-section similar to Intercom's Fin AI Agent + Helpdesk */}
-        <div className="w-full mt-8 pt-6 border-t border-white/75">
-          <div className="grid grid-cols-2 gap-8 items-start">
-            <div className="text-left">
-              <span className="block uppercase text-[13px] md:text-[14px] font-medium tracking-[0.1em] text-white/70">
-                REAL SYSTEMS + REAL TROUBLESHOOTING.
-              </span>
-            </div>
-            <div className="flex flex-col items-end">
-              <p className="text-[17px] text-right md:text-[18px] font-normal leading-relaxed text-[rgba(255,255,255,0.85)]">
+        <div className="mt-6 w-full flex flex-col md:flex-row md:items-start md:justify-between gap-8">
+          {/* Tagline (kept uppercase as focal anchor under pinned heading) */}
+          <div className="flex-1">
+            <span className="block uppercase text-[12px] md:text-[13px] tracking-[0.18em] font-medium text-white/70">
+              Real systems + real troubleshooting
+            </span>
+          </div>
+
+          <div
+            className="will-change-transform transition-transform duration-300"
+            style={parallaxGroupStyle}
+          >
+            {/* Paragraph + CTAs */}
+            <div className="flex-1 flex flex-col items-start md:items-end">
+              <p
+                className="text-[16px] md:text-[17px] leading-relaxed text-white/85 max-w-xl transition-[opacity,transform,filter] duration-300 text-left md:text-right"
+                style={paragraphStyle}
+              >
                 Help Desk Hero isn’t a simulation. It’s hands‑on training with
                 real virtual machines where you diagnose, repair, and learn by
                 doing.
               </p>
 
               <div className="mt-6 flex items-center gap-4">
-                <button className="self-start px-6 py-3 rounded-xl font-medium text-white bg-transparent border border-white/30 hover:border-white/50 transition-colors duration-200">
+                <button
+                  className="px-6 py-3 rounded-xl font-medium text-white bg-transparent border border-white/30 hover:border-white/60 backdrop-blur-[2px] transition-colors duration-200"
+                  aria-label="Learn concepts"
+                >
                   Learn concepts
                 </button>
-                <button className="self-start px-8 py-3 rounded-xl font-semibold text-black bg-teal-300 hover:bg-teal-400 hover:shadow-[0_0_15px_#14b8a6] transition-all duration-200">
-                  <Link href="/problems">Start Practicing</Link>
-                </button>
+                <Link
+                  href="/problems"
+                  className="px-8 py-3 rounded-xl font-semibold text-black bg-teal-300 hover:bg-teal-400 hover:shadow-[0_0_18px_#14b8a6] transition-all duration-200"
+                  aria-label="Start Practicing"
+                >
+                  Start Practicing
+                </Link>
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Optional progress indicator for debugging (hidden by default) */}
+        <div className="absolute bottom-4 right-6 text-xs text-white/40 select-none hidden">
+          progress: {(progress * 100).toFixed(1)}%
         </div>
       </div>
     </section>
   );
 }
+
+/* Tailwind helper animation (already used in original code).
+   If not defined globally, include below in a CSS file:
+   .animate-gradient-x {
+     animation: gradientMove 10s linear infinite;
+     background-size: 200% auto;
+   }
+   @keyframes gradientMove {
+     0% { background-position: 0% 50%; }
+     100% { background-position: 200% 50%; }
+   }
+ */
