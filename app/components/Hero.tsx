@@ -54,7 +54,7 @@ export default function Hero() {
 
               <div className="mt-6 flex items-center gap-4">
                 <button className="self-start px-6 py-3 rounded-xl font-medium text-white bg-transparent border border-white/30 hover:border-white/50 transition-colors duration-200">
-                  Learn concepts
+                  <Link href="/learn">Learn Concepts</Link>
                 </button>
                 <button className="self-start px-8 py-3 rounded-xl font-semibold text-black bg-teal-300 hover:bg-teal-400 hover:shadow-[0_0_15px_#14b8a6] transition-all duration-200">
                   <Link href="/problems">Start Practicing</Link>
