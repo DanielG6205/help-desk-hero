@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { db } from "@/lib/firebase";
-import { collection, getDocs, doc, getDoc } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Flame, Snowflake, ArrowLeft } from "lucide-react";
@@ -19,21 +19,24 @@ export default function StreakboardPage() {
 
   useEffect(() => {
     async function load() {
-      const snap = await getDocs(collection(db, "leaderboard"));
+      const snap = await getDocs(collection(db, "users"));
 
       const data: StreakEntry[] = snap.docs.map((d) => {
         const raw = d.data();
 
-        const name =
-          raw.displayName ||
-          (raw.email ? raw.email.split("@")[0] : null) ||
-          "Unknown User";
+        // get display name OR fallback to email prefix
+        const fullName =
+          raw.displayName ??
+          (raw.email ? raw.email.split("@")[0] : "Unknown User");
+
+        // extract FIRST NAME only
+        const firstName = fullName.split(" ")[0];
 
         return {
-          displayName: name,
-          streak: raw.streak || 0,
-          streakFreezeAvailable: raw.streakFreezeAvailable || false,
           uid: d.id,
+          displayName: firstName,
+          streak: raw.streak ?? 0,
+          streakFreezeAvailable: raw.streakFreezeAvailable ?? false,
         };
       });
 

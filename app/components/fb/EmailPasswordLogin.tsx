@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { auth } from "@/lib/firebase";
+import { auth, db } from "@/lib/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 import { errorMessages } from "./ErrorMessages";
 
 export default function EmailPasswordLogin() {
@@ -17,7 +18,19 @@ export default function EmailPasswordLogin() {
     setLoading(true);
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      // 1. Log user in
+      const userCred = await signInWithEmailAndPassword(auth, email, password);
+
+      // 2. Sync Firebase Auth → Firestore
+      await setDoc(
+        doc(db, "users", userCred.user.uid),
+        {
+          displayName: userCred.user.displayName,
+          email: userCred.user.email,
+        },
+        { merge: true }
+      );
+
     } catch (err: any) {
       const friendly =
         errorMessages[err.code] || "Something went wrong. Please try again.";
@@ -29,7 +42,6 @@ export default function EmailPasswordLogin() {
 
   return (
     <form onSubmit={handleLogin} className="space-y-4">
-
       <input
         type="email"
         placeholder="Email"
