@@ -1,7 +1,8 @@
 "use client";
 
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { auth, db } from "@/lib/firebase";
+import { doc, setDoc } from "firebase/firestore";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { errorMessages } from "./ErrorMessages";
@@ -19,20 +20,29 @@ export default function EmailPasswordSignup() {
     try {
       setError("");
 
-      // Create account
+      // 1. Create user
       const userCred = await createUserWithEmailAndPassword(auth, email, password);
 
-      // Set display name
+      // 2. Set displayName in Firebase Auth
       const fullName = `${firstName} ${lastName}`.trim();
       await updateProfile(userCred.user, { displayName: fullName });
 
-      // 🔥 FORCE REFRESH OF FIREBASE USER
-      await userCred.user.reload();
+      // 3. Write to Firestore (users/{uid})
+      await setDoc(
+        doc(db, "users", userCred.user.uid),
+        {
+          displayName: fullName,
+          email: userCred.user.email,
+          createdAt: Date.now(),
+        },
+        { merge: true }
+      );
 
-      // 🔥 FORCE NEXT.JS TO UPDATE UI
+      // 4. Refresh User Object
+      await userCred.user.reload();
       router.refresh();
 
-      // Redirect
+      // 5. Redirect
       router.push("/");
 
     } catch (e: any) {
