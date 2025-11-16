@@ -4,7 +4,9 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import ProblemCard from "./ProblemCard";
 import { problems } from "./index";
-import { useCompletion } from "./lib/useCompletion";
+import { useCompletion } from "../../lib/useCompletion";
+import { useAuth } from "../components/fb/AuthContent";
+import LoginRequired from "../components/fb/LoginRequired";
 
 const difficulties = ["Easy", "Medium", "Hard"] as const;
 const skillsList = [
@@ -22,12 +24,48 @@ const skillsList = [
 type StatusFilter = "all" | "done" | "not_done";
 
 export default function ProblemsPage() {
+  // ---------- ALL HOOKS MUST BE AT TOP ----------
+  const { user, loading } = useAuth();
+  const { isDone, doneIds } = useCompletion();
+
   const [selectedDifficulty, setSelectedDifficulty] = useState<string[]>([]);
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [status, setStatus] = useState<StatusFilter>("all");
 
-  const { isDone, doneIds } = useCompletion();
+  // ---------- FIXED: ALL useMemo hooks BEFORE conditional return ----------
+  const counts = useMemo(() => {
+    const completed = problems.filter((p) => isDone(p.id)).length;
+    return {
+      done: completed,
+      not: problems.length - completed,
+      all: problems.length,
+    };
+  }, [isDone]);
 
+  const filteredProblems = useMemo(() => {
+    return problems.filter((p) => {
+      const diffOk =
+        selectedDifficulty.length === 0 ||
+        selectedDifficulty.includes(p.difficulty);
+
+      const skillsOk =
+        selectedSkills.length === 0 ||
+        selectedSkills.every((skill) => p.skills.includes(skill));
+
+      const statusOk =
+        status === "all" ||
+        (status === "done" && isDone(p.id)) ||
+        (status === "not_done" && !isDone(p.id));
+
+      return diffOk && skillsOk && statusOk;
+    });
+  }, [selectedDifficulty, selectedSkills, status, isDone]);
+
+  // ---------- AUTH GUARD (after hooks only) ----------
+  if (loading) return null;
+  if (!user) return <LoginRequired />;
+
+  // ---------- FILTER HANDLER ----------
   const toggleFilter = (filter: string, setter: any, current: string[]) => {
     setter(
       current.includes(filter)
@@ -36,29 +74,11 @@ export default function ProblemsPage() {
     );
   };
 
-  const counts = useMemo(() => {
-    const done = problems.filter((p) => isDone(p.id)).length;
-    return { done, not: problems.length - done, all: problems.length };
-  }, [isDone]);
-
-  const filteredProblems = useMemo(() => {
-    return problems.filter((p) => {
-      const diffOk =
-        selectedDifficulty.length === 0 ||
-        selectedDifficulty.includes(p.difficulty);
-      const skillsOk =
-        selectedSkills.length === 0 ||
-        selectedSkills.every((skill) => p.skills.includes(skill));
-      const statusOk =
-        status === "all" ||
-        (status === "done" && isDone(p.id)) ||
-        (status === "not_done" && !isDone(p.id));
-      return diffOk && skillsOk && statusOk;
-    });
-  }, [selectedDifficulty, selectedSkills, status, isDone]);
-
+  // ---------- RENDER ----------
   return (
     <div className="flex min-h-screen pt-24 px-6 bg-black text-white">
+
+      {/* -------- FILTER SIDEBAR -------- */}
       <aside className="w-72 bg-white/5 border border-white/10 rounded-xl p-6 backdrop-blur-md h-fit sticky top-28">
         <h2 className="text-xl font-semibold mb-4 bg-gradient-to-r from-teal-300 to-blue-400 text-transparent bg-clip-text">
           Filters
@@ -68,6 +88,7 @@ export default function ProblemsPage() {
         <div className="mb-6">
           <h3 className="text-teal-300 font-medium mb-2">Status</h3>
           <div className="space-y-2">
+
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="radio"
@@ -78,6 +99,7 @@ export default function ProblemsPage() {
               />
               All <span className="text-xs text-gray-400 ml-auto">{counts.all}</span>
             </label>
+
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="radio"
@@ -88,6 +110,7 @@ export default function ProblemsPage() {
               />
               Done <span className="text-xs text-gray-400 ml-auto">{counts.done}</span>
             </label>
+
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="radio"
@@ -123,7 +146,7 @@ export default function ProblemsPage() {
         {/* Skills */}
         <h3 className="text-teal-300 font-medium mb-2">Skills</h3>
         {skillsList.map((skill) => (
-          <label key={skill} className="flex items-center gap-2 cursor-pointer">
+          <label key={skill} className="flex items-center gap-2 cursor-pointer mb-1">
             <input
               type="checkbox"
               className="accent-teal-400"
@@ -135,8 +158,10 @@ export default function ProblemsPage() {
             {skill}
           </label>
         ))}
+
       </aside>
 
+      {/* -------- MAIN LIST -------- */}
       <main className="flex-1 ml-10">
         <h1 className="text-3xl font-bold mb-6 bg-gradient-to-r from-teal-300 to-blue-400 text-transparent bg-clip-text">
           Problems

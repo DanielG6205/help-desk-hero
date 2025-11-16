@@ -79,36 +79,36 @@ export default function Hero() {
   const headingStyle: React.CSSProperties = reduceMotion
     ? {}
     : {
-        opacity: clamp01(fadeOut),
-        filter: `blur(${blurAmount.toFixed(2)}px)`,
-        transform: `translateY(${(progress * 25).toFixed(2)}px)`,
-      };
+      opacity: clamp01(fadeOut),
+      filter: `blur(${blurAmount.toFixed(2)}px)`,
+      transform: `translateY(${(progress * 25).toFixed(2)}px)`,
+    };
 
   const paragraphStyle: React.CSSProperties = reduceMotion
     ? {}
     : {
-        opacity: clamp01(fadeOut),
-        filter: `blur(${blurAmount.toFixed(2)}px)`,
-        transform: `translateY(${(progress * 20).toFixed(2)}px)`,
-      };
+      opacity: clamp01(fadeOut),
+      filter: `blur(${blurAmount.toFixed(2)}px)`,
+      transform: `translateY(${(progress * 20).toFixed(2)}px)`,
+    };
 
   const pinnedHeroStyle: React.CSSProperties = reduceMotion
     ? {}
     : {
-        transform: `translateY(${heroDrift.toFixed(2)}px)`,
-      };
+      transform: `translateY(${heroDrift.toFixed(2)}px)`,
+    };
 
   const miniSectionStyle: React.CSSProperties = reduceMotion
     ? {}
     : {
-        transform: `translateY(${miniSectionDrift.toFixed(2)}px)`,
-      };
+      transform: `translateY(${miniSectionDrift.toFixed(2)}px)`,
+    };
 
   const parallaxGroupStyle: React.CSSProperties = reduceMotion
     ? {}
     : {
-        transform: `translateY(${(-parallaxRise).toFixed(2)}px)`,
-      };
+      transform: `translateY(${(-parallaxRise).toFixed(2)}px)`,
+    };
 
   return (
     <section
