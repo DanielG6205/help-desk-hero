@@ -263,7 +263,7 @@ export const problems: Problem[] = [
     serverRdpFile: "/rdp/8/server.rdp",
     workshopRdpFile: "/rdp/8/workstation.rdp",
     completionKey: "GPO888",
-
+    image:"",
     labScenario: [
       "A workstation is missing mapped drives and restrictions.",
       "GPO inheritance or filtering might be broken.",
@@ -294,7 +294,7 @@ export const problems: Problem[] = [
     serverRdpFile: "/rdp/9/server.rdp",
     workshopRdpFile: "/rdp/9/workstation.rdp",
     completionKey: "KRBOS777",
-
+    image:"",
     labScenario: [
       "Users cannot access services requiring Kerberos.",
       "Event Viewer logs show KRB5 and ticket errors.",
