@@ -1,12 +1,16 @@
 import { notFound } from "next/navigation";
 import { articles } from "../data";
 
-export default function ArticlePage({
+type PageParams = {
+  id: string;
+};
+export default async function ArticlePage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<PageParams>;
 }) {
-  const articleId = Number(params.id);
+  const { id } = await params;
+  const articleId = Number(id);
 
   const article = articles.find((a) => a.id === articleId);
 
@@ -15,7 +19,6 @@ export default function ArticlePage({
   return (
     <div className="min-h-screen bg-black text-white pt-24 px-6">
       <div className="max-w-3xl mx-auto bg-white/5 border border-white/10 rounded-xl p-10 backdrop-blur-md">
-
         {/* CATEGORY + READ TIME */}
         <div className="flex items-center gap-4 text-sm text-gray-300 mb-3">
           <span className="px-3 py-1 rounded-full bg-white/10 border border-white/20">
@@ -37,8 +40,8 @@ export default function ArticlePage({
         {/* BODY (placeholder) */}
         <div className="text-gray-400 space-y-4">
           <p>
-            This article content is coming soon. You will find detailed guidance,
-            step-by-step instructions, and real-world examples here.
+            This article content is coming soon. You will find detailed
+            guidance, step-by-step instructions, and real-world examples here.
           </p>
 
           <p>
@@ -46,9 +49,7 @@ export default function ArticlePage({
             grow your technical skills.
           </p>
 
-          <p>
-            Stay tuned — new content is being added every week.
-          </p>
+          <p>Stay tuned — new content is being added every week.</p>
         </div>
       </div>
     </div>
