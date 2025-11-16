@@ -6,15 +6,15 @@ import { problems } from "../index";
 import { useCompletion } from "../../../lib/useCompletion";
 import { useAuth } from "@/app/components/fb/AuthContent";
 import LoginRequired from "@/app/components/fb/LoginRequired";
+import PremiumLocked from "@/app/components/PremiumLocked";
+import { usePremium } from "@/lib/usePremium";
 
 export default function ProblemDetail() {
-  // -----------------------------------------------------------
-  // ✅ ALL HOOKS MUST BE AT THE TOP — NO CONDITIONAL RETURNS
-  // -----------------------------------------------------------
-
   const params = useParams<{ id: string }>();
   const router = useRouter();
+
   const { user, loading } = useAuth();
+  const premium = usePremium(); // 🔥 NEW
   const { isDone, setDone } = useCompletion();
 
   const problemId = Number(params.id);
@@ -33,11 +33,10 @@ export default function ProblemDetail() {
   const [openTasks, setOpenTasks] = useState(false);
   const [openOutcome, setOpenOutcome] = useState(false);
 
-  // -----------------------------------------------------------
-  // ❗ AFTER ALL HOOKS — NOW WE CAN RETURN CONDITIONALLY
-  // -----------------------------------------------------------
-
-  if (loading) return null;
+  // ------------------------------
+  // ACCESS CONTROL
+  // ------------------------------
+  if (loading || premium === null) return null;     // Wait for Firebase
   if (!user) return <LoginRequired />;
 
   if (!problem) {
@@ -45,11 +44,13 @@ export default function ProblemDetail() {
     return null;
   }
 
+  // 🔐 If premium problem but user is not premium → lock page
+  if (problem.premium && !premium) {
+    return <PremiumLocked />;
+  }
+
   async function submitKey() {
-    if (!problem) {
-      setError("Problem not found.");
-      return;
-    }
+    if (!problem) return;
 
     if (inputKey.trim() === problem.completionKey) {
       await setDone(problemId, true);
@@ -59,15 +60,19 @@ export default function ProblemDetail() {
     }
   }
 
-  // -----------------------------------------------------------
-  // UI
-  // -----------------------------------------------------------
   return (
     <div className="min-h-screen pt-24 px-6 bg-black text-white">
       <div className="max-w-4xl mx-auto bg-white/5 border border-white/10 rounded-xl p-8 backdrop-blur-md">
         
-        <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-teal-300 to-blue-400 text-transparent bg-clip-text">
-          {problem.name}
+        {/* TITLE + LOCK IF PREMIUM */}
+        <h1 className="text-4xl font-bold mb-4 flex items-center gap-3">
+          <span className="bg-gradient-to-r from-teal-300 to-blue-400 text-transparent bg-clip-text">
+            {problem.name}
+          </span>
+
+          {problem.premium && (
+            <span className="text-yellow-300 text-3xl">🔒</span>
+          )}
         </h1>
 
         <div className="flex flex-wrap items-center gap-4 mb-8 text-gray-300">
@@ -83,6 +88,12 @@ export default function ProblemDetail() {
               {s}
             </span>
           ))}
+
+          {problem.premium && (
+            <span className="px-3 py-1 rounded-full bg-yellow-600/20 border border-yellow-500 text-yellow-400 text-sm">
+              Premium Lab
+            </span>
+          )}
         </div>
 
         {/* RDP BUTTONS */}
@@ -104,10 +115,9 @@ export default function ProblemDetail() {
           </a>
         </div>
 
-        {/* DROPDOWN SECTIONS */}
+        {/* SECTIONS */}
         <div className="space-y-6">
 
-          {/* Scenario */}
           <div className="bg-white/5 border border-white/10 p-6 rounded-lg">
             <button
               className="text-xl font-semibold flex justify-between w-full"
@@ -125,7 +135,6 @@ export default function ProblemDetail() {
             )}
           </div>
 
-          {/* Tasks */}
           <div className="bg-white/5 border border-white/10 p-6 rounded-lg">
             <button
               className="text-xl font-semibold flex justify-between w-full"
@@ -143,7 +152,6 @@ export default function ProblemDetail() {
             )}
           </div>
 
-          {/* Expected Outcome */}
           <div className="bg-white/5 border border-white/10 p-6 rounded-lg">
             <button
               className="text-xl font-semibold flex justify-between w-full"
@@ -163,11 +171,13 @@ export default function ProblemDetail() {
 
         </div>
 
-        {/* Completion Key */}
+        {/* COMPLETION KEY */}
         <div className="mt-10 bg-white/5 border border-white/10 p-6 rounded-lg">
           {!done ? (
             <>
-              <h2 className="text-xl font-semibold mb-3">Enter Completion Key</h2>
+              <h2 className="text-xl font-semibold mb-3">
+                Enter Completion Key
+              </h2>
 
               <input
                 value={inputKey}
@@ -176,7 +186,7 @@ export default function ProblemDetail() {
                 placeholder="Enter key..."
               />
 
-              {error && <p className="mt-2 text-red-400 text-sm">{error}</p>}
+              {error && <p className="mt-2 text-red-400">{error}</p>}
 
               <button
                 onClick={submitKey}

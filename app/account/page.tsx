@@ -5,7 +5,7 @@ import LoginRequired from "@/app/components/fb/LoginRequired";
 import { useCompletion } from "@/lib/useCompletion";
 import { problems } from "../problems/index";
 import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, doc, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import Link from "next/link";
 
@@ -74,13 +74,13 @@ export default function AccountPage() {
           </h1>
         </div>
 
-        {/* USER SECTION */}
+        {/* USER */}
         <div className="bg-white/5 p-6 rounded-xl border border-white/10 mb-10">
           <h2 className="text-2xl font-semibold mb-1">{displayName}</h2>
           <p className="text-gray-300">{user.email}</p>
         </div>
 
-        {/* PROGRESS SECTION */}
+        {/* PROGRESS */}
         <div className="bg-white/5 p-6 rounded-xl border border-white/10 mb-10">
           <div className="flex items-center gap-2 mb-3">
             <Target className="w-6 h-6 text-teal-300" />
@@ -88,8 +88,7 @@ export default function AccountPage() {
           </div>
 
           <p className="text-gray-300 mb-3">
-            <span className="text-teal-300 font-bold text-lg">{solved}</span> /{" "}
-            {totalProblems}
+            <span className="text-teal-300 font-bold text-lg">{solved}</span> / {totalProblems}
           </p>
 
           <div className="w-full h-4 bg-white/10 rounded-full overflow-hidden">
@@ -100,7 +99,7 @@ export default function AccountPage() {
           </div>
         </div>
 
-        {/* RANK */}
+        {/* LEADERBOARD RANK */}
         <div className="bg-white/5 p-6 rounded-xl border border-white/10 mb-10">
           <div className="flex items-center gap-2 mb-3">
             <Crown className="w-6 h-6 text-yellow-300" />
@@ -110,14 +109,22 @@ export default function AccountPage() {
           {rank ? (
             <p className="text-gray-300">
               You are currently{" "}
-              <span className="text-yellow-300 font-bold text-xl">
-                #{rank}
-              </span>{" "}
+              <span className="text-yellow-300 font-bold text-xl">#{rank}</span>{" "}
               out of {leaders.length} users.
             </p>
           ) : (
             <p className="text-gray-500">You are not ranked yet.</p>
           )}
+        </div>
+
+        {/* PREMIUM STATUS */}
+        <div className="bg-white/5 p-6 rounded-xl border border-white/10 mb-10">
+          <div className="flex items-center gap-2 mb-3">
+            <Crown className="w-6 h-6 text-purple-300" />
+            <h3 className="text-xl font-semibold">Premium Status</h3>
+          </div>
+
+          <PremiumStatus user={user} />
         </div>
 
         {/* ACHIEVEMENTS */}
@@ -130,7 +137,7 @@ export default function AccountPage() {
           <p className="text-gray-500">Coming soon…</p>
         </div>
 
-        {/* TOP 5 LEADERBOARD */}
+        {/* TOP 5 */}
         <div className="bg-white/5 p-6 rounded-xl border border-white/10">
           <h3 className="text-xl font-semibold mb-4">Leaderboard — Top 5</h3>
 
@@ -150,9 +157,7 @@ export default function AccountPage() {
                   <span className="text-2xl font-bold w-8 text-center">
                     {index + 1}
                   </span>
-                  <span className="text-lg font-medium">
-                    {entry.displayName}
-                  </span>
+                  <span className="text-lg font-medium">{entry.displayName}</span>
                 </div>
 
                 <span className="text-xl font-semibold text-cyan-300">
@@ -162,7 +167,7 @@ export default function AccountPage() {
             ))}
           </div>
 
-        <p className="mt-4 text-sm text-gray-500 text-center">
+          <p className="mt-4 text-sm text-gray-500 text-center">
             Click{" "}
             <Link
               href="/leaderboard"
@@ -171,10 +176,89 @@ export default function AccountPage() {
               here
             </Link>{" "}
             to view the full leaderboard!
-        </p>
-
+          </p>
         </div>
       </motion.div>
+    </div>
+  );
+}
+
+/* ------------------------- PREMIUM STATUS COMPONENT ------------------------- */
+
+function PremiumStatus({ user }: { user: any }) {
+  const [loading, setLoading] = useState(true);
+  const [premium, setPremium] = useState<"free" | "monthly" | "yearly">("free");
+  const [updatedAt, setUpdatedAt] = useState<string | null>(null);
+
+  // LOAD FROM FIRESTORE
+  useEffect(() => {
+    async function load() {
+      const snap = await getDocs(collection(db, "users"));
+      const docData = snap.docs.find((d) => d.id === user.uid)?.data();
+
+      if (docData) {
+        setPremium(docData.premium || "free");
+        setUpdatedAt(docData.premiumUpdatedAt || null);
+      }
+
+      setLoading(false);
+    }
+
+    load();
+  }, [user]);
+
+  const cancelPremium = async () => {
+    const ref = doc(db, "users", user.uid);
+
+    await setDoc(
+      ref,
+      {
+        premium: "free",
+        premiumUpdatedAt: new Date().toISOString(),
+      },
+      { merge: true }
+    );
+
+    setPremium("free");
+    alert("Your premium plan has been canceled.");
+  };
+
+  if (loading)
+    return <p className="text-gray-400 text-sm">Loading premium status…</p>;
+
+  return (
+    <div>
+      {premium !== "free" ? (
+        <>
+          <p className="text-green-400 font-semibold text-lg">
+            ✔ You are a Premium Member!
+          </p>
+
+          {updatedAt && (
+            <p className="text-gray-400 text-sm mt-1">
+              Upgraded on: {new Date(updatedAt).toLocaleString()}
+            </p>
+          )}
+
+          <button
+            onClick={cancelPremium}
+            className="mt-5 w-full py-3 bg-red-600/80 hover:bg-red-700 rounded-lg font-semibold transition"
+          >
+            Cancel Premium
+          </button>
+        </>
+      ) : (
+        <>
+          <p className="text-gray-300 mb-3">You are currently on the Free Plan.</p>
+
+          <Link
+            href="/premium"
+            className="block w-full py-3 bg-yellow-500/80 hover:bg-yellow-600 rounded-lg font-semibold text-center transition"
+          >
+            Upgrade to Premium
+          </Link>
+        </>
+      )}
     </div>
   );
 }
