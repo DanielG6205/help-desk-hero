@@ -3,9 +3,14 @@
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { errorMessages } from "./ErrorMessages";
 
 export default function EmailPasswordSignup() {
-  const [name, setName] = useState("");
+  const router = useRouter();
+
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -14,30 +19,25 @@ export default function EmailPasswordSignup() {
     try {
       setError("");
 
-      // 1. Create user with email and password
+      // Create account
       const userCred = await createUserWithEmailAndPassword(auth, email, password);
 
-      // 2. Update Firebase Auth user profile with name
-      await updateProfile(userCred.user, {
-        displayName: name,
-      });
+      // Set display name
+      const fullName = `${firstName} ${lastName}`.trim();
+      await updateProfile(userCred.user, { displayName: fullName });
 
-      console.log("User created:", userCred.user);
+      // 🔥 FORCE REFRESH OF FIREBASE USER
+      await userCred.user.reload();
 
-      // OPTIONAL: If you want to save name to Firestore:
-      /*
-      import { setDoc, doc } from "firebase/firestore";
-      import { db } from "@/lib/firebase";
+      // 🔥 FORCE NEXT.JS TO UPDATE UI
+      router.refresh();
 
-      await setDoc(doc(db, "users", userCred.user.uid), {
-        name,
-        email,
-        createdAt: new Date(),
-      });
-      */
+      // Redirect
+      router.push("/");
 
     } catch (e: any) {
-      setError(e.message);
+      const friendly = errorMessages[e.code] || errorMessages["default"];
+      setError(friendly);
     }
   };
 
@@ -45,9 +45,16 @@ export default function EmailPasswordSignup() {
     <div className="w-full">
       <input
         className="w-full bg-black/20 text-white p-3 rounded-lg border border-gray-600 mb-3"
-        placeholder="Full Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
+        placeholder="First Name"
+        value={firstName}
+        onChange={(e) => setFirstName(e.target.value)}
+      />
+
+      <input
+        className="w-full bg-black/20 text-white p-3 rounded-lg border border-gray-600 mb-3"
+        placeholder="Last Name"
+        value={lastName}
+        onChange={(e) => setLastName(e.target.value)}
       />
 
       <input
@@ -65,7 +72,7 @@ export default function EmailPasswordSignup() {
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      {error && <p className="text-red-400 mb-2">{error}</p>}
+      {error && <p className="text-red-400 mb-2 text-sm">{error}</p>}
 
       <button
         onClick={signup}

@@ -24,7 +24,7 @@ const skillsList = [
 type StatusFilter = "all" | "done" | "not_done";
 
 export default function ProblemsPage() {
-  // ✅ ALL HOOKS AT TOP — BEFORE ANY CONDITIONAL RETURN
+  // ---------- ALL HOOKS MUST BE AT TOP ----------
   const { user, loading } = useAuth();
   const { isDone, doneIds } = useCompletion();
 
@@ -32,19 +32,7 @@ export default function ProblemsPage() {
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [status, setStatus] = useState<StatusFilter>("all");
 
-  // ---- AUTH GUARD (after all hooks) ----
-  if (loading) return null;
-  if (!user) return <LoginRequired />;
-
-  // ---------- FILTER LOGIC ----------
-  const toggleFilter = (filter: string, setter: any, current: string[]) => {
-    setter(
-      current.includes(filter)
-        ? current.filter((f) => f !== filter)
-        : [...current, filter]
-    );
-  };
-
+  // ---------- FIXED: ALL useMemo hooks BEFORE conditional return ----------
   const counts = useMemo(() => {
     const completed = problems.filter((p) => isDone(p.id)).length;
     return {
@@ -73,10 +61,23 @@ export default function ProblemsPage() {
     });
   }, [selectedDifficulty, selectedSkills, status, isDone]);
 
-  // ---------- RENDER UI ----------
+  // ---------- AUTH GUARD (after hooks only) ----------
+  if (loading) return null;
+  if (!user) return <LoginRequired />;
+
+  // ---------- FILTER HANDLER ----------
+  const toggleFilter = (filter: string, setter: any, current: string[]) => {
+    setter(
+      current.includes(filter)
+        ? current.filter((f) => f !== filter)
+        : [...current, filter]
+    );
+  };
+
+  // ---------- RENDER ----------
   return (
     <div className="flex min-h-screen pt-24 px-6 bg-black text-white">
-      
+
       {/* -------- FILTER SIDEBAR -------- */}
       <aside className="w-72 bg-white/5 border border-white/10 rounded-xl p-6 backdrop-blur-md h-fit sticky top-28">
         <h2 className="text-xl font-semibold mb-4 bg-gradient-to-r from-teal-300 to-blue-400 text-transparent bg-clip-text">
@@ -87,6 +88,7 @@ export default function ProblemsPage() {
         <div className="mb-6">
           <h3 className="text-teal-300 font-medium mb-2">Status</h3>
           <div className="space-y-2">
+
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="radio"
@@ -156,6 +158,7 @@ export default function ProblemsPage() {
             {skill}
           </label>
         ))}
+
       </aside>
 
       {/* -------- MAIN LIST -------- */}

@@ -1,13 +1,23 @@
 "use client";
 
+import { useEffect } from "react";
 import GoogleLoginButton from "../components/fb/GoogleLoginButton";
 import EmailPasswordLogin from "../components/fb/EmailPasswordLogin";
 import Link from "next/link";
 import { useAuth } from "../components/fb/AuthContent";
 import LogoutButton from "../components/fb/LogoutButton";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const { user, loading } = useAuth();
+  const router = useRouter();
+
+  // 🚀 Auto-redirect once user is logged in
+  useEffect(() => {
+    if (!loading && user) {
+      router.replace("/"); // redirect to home
+    }
+  }, [user, loading, router]);
 
   if (loading) return null;
 
@@ -19,18 +29,11 @@ export default function LoginPage() {
         {user ? (
           <>
             <h1 className="text-3xl font-bold text-center mb-4">
-              You are already logged in 🔒
+              Redirecting...
             </h1>
-
             <p className="text-center text-gray-300">
-              Continue to{" "}
-              <Link href="/problems" className="text-teal-400 underline">
-                problems
-              </Link>
+              Taking you to the home page.
             </p>
-
-            {/* Logout Button */}
-            <LogoutButton />
           </>
         ) : (
           <>
@@ -39,22 +42,18 @@ export default function LoginPage() {
               Sign in to continue your helpdesk training.
             </p>
 
-            {/* Social Login */}
             <div className="space-y-4 mb-6 flex flex-col items-center">
               <GoogleLoginButton />
             </div>
 
-            {/* Divider */}
             <div className="flex items-center gap-4 mb-6">
               <div className="flex-1 h-[1px] bg-gray-600" />
               <span className="text-gray-400 text-sm">OR</span>
               <div className="flex-1 h-[1px] bg-gray-600" />
             </div>
 
-            {/* Email Login */}
             <EmailPasswordLogin />
 
-            {/* Link to Sign Up */}
             <p className="text-center text-gray-400 mt-6">
               Don’t have an account?{" "}
               <Link href="/signup" className="text-teal-400 underline">

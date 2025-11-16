@@ -12,6 +12,17 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // Helper to safely extract first name
+  const getFirstName = () => {
+    if (user?.displayName) {
+      return user.displayName.split(" ")[0];
+    }
+    if (user?.email) {
+      return user.email.split("@")[0]; // fallback to email username
+    }
+    return "User";
+  };
+
   // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -35,10 +46,10 @@ export default function Navbar() {
           HelpDeskHero
         </Link>
 
-        {/* Links + Auth */}
+        {/* Desktop Links + Auth */}
         <div className="hidden md:flex gap-10 text-gray-200 items-center">
 
-          {/* Page links */}
+          {/* Page Links */}
           {["Problems", "About", "Learn"].map((item) => (
             <Link
               key={item}
@@ -54,7 +65,7 @@ export default function Navbar() {
             <Link
               href="/login"
               className="px-4 py-2 rounded-lg bg-teal-400 text-black font-semibold 
-                        hover:bg-teal-300 hover:shadow-[0_0_12px_#14b8a6] transition-all"
+                         hover:bg-teal-300 hover:shadow-[0_0_12px_#14b8a6] transition-all"
             >
               Login
             </Link>
@@ -65,7 +76,7 @@ export default function Navbar() {
                 className="px-4 py-2 rounded-lg bg-teal-400 text-black font-semibold 
                            hover:bg-teal-300 hover:shadow-[0_0_12px_#14b8a6] transition-all"
               >
-                Hi, {user.displayName?.split(" ")[0] || "User"}
+                Hi, {getFirstName()}
               </button>
 
               {/* Dropdown */}
