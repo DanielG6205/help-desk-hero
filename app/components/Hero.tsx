@@ -30,8 +30,11 @@ export default function Hero() {
         <h1 className="text-7xl font-extrabold tracking-wide drop-shadow-lg text-white mt-2">
           Troubleshoot real computers.
         </h1>
-        <h1 className="text-7xl font-extrabold tracking-wide drop-shadow-lg text-white mt-2">
-          Be a Hero.
+        <h1 className="text-7xl font-extrabold tracking-wide drop-shadow-lg mt-2">
+          Be a{" "}
+          <span className="inline-block bg-gradient-to-r from-teal-300 via-cyan-400 to-blue-400 text-transparent bg-clip-text animate-gradient-x bg-[length:200%_auto]">
+            Hero
+          </span>
         </h1>
 
         {/* Sub-section similar to Intercom's Fin AI Agent + Helpdesk */}
@@ -42,19 +45,24 @@ export default function Hero() {
                 REAL SYSTEMS + REAL TROUBLESHOOTING.
               </span>
             </div>
-            <div className="text-right">
-              <p className="text-[17px] md:text-[18px] font-normal leading-relaxed text-[rgba(255,255,255,0.85)]">
+            <div className="flex flex-col items-end">
+              <p className="text-[17px] text-right md:text-[18px] font-normal leading-relaxed text-[rgba(255,255,255,0.85)]">
                 Help Desk Hero isn’t a simulation. It’s hands‑on training with
                 real virtual machines where you diagnose, repair, and learn by
                 doing.
               </p>
+
+              <div className="mt-6 flex items-center gap-4">
+                <button className="self-start px-6 py-3 rounded-xl font-medium text-white bg-transparent border border-white/30 hover:border-white/50 transition-colors duration-200">
+                  Learn concepts
+                </button>
+                <button className="self-start px-8 py-3 rounded-xl font-semibold text-black bg-teal-300 hover:bg-teal-400 hover:shadow-[0_0_15px_#14b8a6] transition-all duration-200">
+                  <Link href="/problems">Start Practicing</Link>
+                </button>
+              </div>
             </div>
           </div>
         </div>
-
-        <button className="self-end mt-10 px-8 py-3 rounded-xl font-semibold text-black bg-teal-300 hover:bg-teal-400 hover:shadow-[0_0_15px_#14b8a6] transition-all duration-200">
-          <Link href="/problems">Start Practicing</Link>
-        </button>
       </div>
     </section>
   );
