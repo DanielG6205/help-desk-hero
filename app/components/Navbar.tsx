@@ -35,16 +35,18 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav className="fixed top-0 left-0 w-full z-30 bg-white/10 backdrop-blur-lg border-b border-white/20">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+    <nav className="fixed top-0 py-2 left-0 w-full z-30 bg-white/10 backdrop-blur-lg border-b border-white/20">
+      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
 
         {/* Logo */}
-        <Link
-          href="/"
-          className="text-2xl font-bold text-teal-300 drop-shadow-[0_0_4px_#14b8a6]"
-        >
-          HelpDeskHero
+        <Link href="/" className="block">
+          <img
+            src="/logo.png"
+            alt="HelpDeskHero Logo"
+            className="h-14 w-auto"
+          />
         </Link>
+
 
         {/* Desktop Links + Auth */}
         <div className="hidden md:flex gap-10 text-gray-200 items-center">
@@ -99,6 +101,14 @@ export default function Navbar() {
                     onClick={() => setOpen(false)}
                   >
                     Settings
+                  </Link>
+
+                  <Link
+                    href="/premium"
+                    className="block px-4 py-2 hover:bg-gray-100 transition"
+                    onClick={() => setOpen(false)}
+                  >
+                    Upgrade
                   </Link>
 
                   <button

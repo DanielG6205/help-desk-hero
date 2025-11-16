@@ -1,12 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import ProblemCard from "./ProblemCard";
 import { problems } from "./index";
 import { useCompletion } from "../../lib/useCompletion";
 import { useAuth } from "../components/fb/AuthContent";
 import LoginRequired from "../components/fb/LoginRequired";
+
+import { db } from "@/lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
 
 const difficulties = ["Easy", "Medium", "Hard"] as const;
 const skillsList = [
@@ -24,15 +27,36 @@ const skillsList = [
 type StatusFilter = "all" | "done" | "not_done";
 
 export default function ProblemsPage() {
-  // ---------- ALL HOOKS MUST BE AT TOP ----------
+  // ---------- ALL HOOKS ----------
   const { user, loading } = useAuth();
   const { isDone, doneIds } = useCompletion();
+
+  const [premiumStatus, setPremiumStatus] = useState<
+    "free" | "monthly" | "yearly"
+  >("free");
 
   const [selectedDifficulty, setSelectedDifficulty] = useState<string[]>([]);
   const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
   const [status, setStatus] = useState<StatusFilter>("all");
 
-  // ---------- FIXED: ALL useMemo hooks BEFORE conditional return ----------
+  // ---------- LOAD PREMIUM ----------
+  useEffect(() => {
+    async function load() {
+      if (!user) return;
+
+      const ref = doc(db, "users", user.uid);
+      const snap = await getDoc(ref);
+
+      if (snap.exists()) {
+        const data = snap.data();
+        setPremiumStatus(data.premium || "free");
+      }
+    }
+
+    load();
+  }, [user]);
+
+  // ---------- MEMOS ----------
   const counts = useMemo(() => {
     const completed = problems.filter((p) => isDone(p.id)).length;
     return {
@@ -61,7 +85,7 @@ export default function ProblemsPage() {
     });
   }, [selectedDifficulty, selectedSkills, status, isDone]);
 
-  // ---------- AUTH GUARD (after hooks only) ----------
+  // ---------- AUTH GUARD ----------
   if (loading) return null;
   if (!user) return <LoginRequired />;
 
@@ -88,7 +112,6 @@ export default function ProblemsPage() {
         <div className="mb-6">
           <h3 className="text-teal-300 font-medium mb-2">Status</h3>
           <div className="space-y-2">
-
             <label className="flex items-center gap-2 cursor-pointer">
               <input
                 type="radio"
@@ -158,7 +181,6 @@ export default function ProblemsPage() {
             {skill}
           </label>
         ))}
-
       </aside>
 
       {/* -------- MAIN LIST -------- */}
@@ -168,14 +190,23 @@ export default function ProblemsPage() {
         </h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {filteredProblems.map((problem) => (
-            <Link href={`/problems/${problem.id}`} key={problem.id}>
-              <ProblemCard
-                problem={problem}
-                done={doneIds.has(problem.id)}
-              />
-            </Link>
-          ))}
+          {filteredProblems.map((problem) => {
+            const done = doneIds.has(problem.id);
+            const isLocked = problem.premium && !done && premiumStatus === "free";
+
+            return (
+              <Link
+                href={isLocked ? "/premium" : `/problems/${problem.id}`}
+                key={problem.id}
+              >
+                <ProblemCard
+                  problem={problem}
+                  done={done}
+                  premiumStatus={premiumStatus}
+                />
+              </Link>
+            );
+          })}
         </div>
       </main>
     </div>
