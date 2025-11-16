@@ -8,7 +8,7 @@ export type Problem = {
   workshopRdpFile: string;
   instructions: string[];
   completionKey: string;
-
+  image: string;
   labScenario: string[];
   labTasks: string[];
   expectedOutcome: string[];
@@ -26,11 +26,11 @@ export const problems: Problem[] = [
     serverRdpFile: "/rdp/1/server.rdp",
     workshopRdpFile: "/rdp/1/workstation.rdp",
     completionKey: "LetMeInNow",
-
+    image: "lab1.webp",
     labScenario: [
       "A user cannot access a department shared folder.",
       "The folder is controlled using an AD security group.",
-      "You must add the user to the correct group."
+      "You must add the user to the correct group.",
     ],
 
     labTasks: [
@@ -38,20 +38,20 @@ export const problems: Problem[] = [
       "Locate the user in ADUC.",
       "Add the user to the correct AD group.",
       "Have the user refresh their session.",
-      "Verify folder access."
+      "Verify folder access.",
     ],
 
     expectedOutcome: [
       "User gains proper shared folder access.",
-      "AD group membership updated successfully."
+      "AD group membership updated successfully.",
     ],
 
     instructions: [
       "Open ADUC.",
       "Navigate to the correct group.",
       "Add the user.",
-      "Test access."
-    ]
+      "Test access.",
+    ],
   },
 
   {
@@ -63,30 +63,28 @@ export const problems: Problem[] = [
     serverRdpFile: "/rdp/2/server.rdp",
     workshopRdpFile: "/rdp/2/workstation.rdp",
     completionKey: "PRINT123",
-
+    image: "lab2.webp",
     labScenario: [
       "A user cannot see their assigned network printer.",
       "The printer is deployed via the print server.",
-      "You must restore the mapping."
+      "You must restore the mapping.",
     ],
 
     labTasks: [
       "Ping the print server.",
       "Check printer status.",
       "Re-add the printer to the workstation.",
-      "Print a test page."
+      "Print a test page.",
     ],
 
-    expectedOutcome: [
-      "Printer appears and prints successfully."
-    ],
+    expectedOutcome: ["Printer appears and prints successfully."],
 
     instructions: [
       "Open Print Management.",
       "Verify printer online.",
       "Re-add the printer.",
-      "Test print."
-    ]
+      "Test print.",
+    ],
   },
 
   {
@@ -98,11 +96,11 @@ export const problems: Problem[] = [
     serverRdpFile: "/rdp/3/server.rdp",
     workshopRdpFile: "/rdp/3/workstation.rdp",
     completionKey: "MAPME222",
-
+    image: "lab3.webp",
     labScenario: [
       "A user's network drives do not map after login.",
       "The organization uses login scripts via GPO.",
-      "You must resolve the mapping failure."
+      "You must resolve the mapping failure.",
     ],
 
     labTasks: [
@@ -110,19 +108,17 @@ export const problems: Problem[] = [
       "Verify DNS resolution for the file server.",
       "Check share permissions for the script.",
       "Manually run the script.",
-      "Fix missing drive mappings."
+      "Fix missing drive mappings.",
     ],
 
-    expectedOutcome: [
-      "Drive mappings work automatically on login."
-    ],
+    expectedOutcome: ["Drive mappings work automatically on login."],
 
     instructions: [
       "Run gpresult.",
       "Verify script path.",
       "Test manual execution.",
-      "Fix drive mappings."
-    ]
+      "Fix drive mappings.",
+    ],
   },
 
   // -------------------------------------------------
@@ -137,10 +133,10 @@ export const problems: Problem[] = [
     serverRdpFile: "/rdp/4/server.rdp",
     workshopRdpFile: "/rdp/4/workstation.rdp",
     completionKey: "VPN444",
-
+    image: "lab4.webp",
     labScenario: [
       "A user cannot connect to the VPN.",
-      "DNS and authentication errors appear during connection."
+      "DNS and authentication errors appear during connection.",
     ],
 
     labTasks: [
@@ -148,18 +144,16 @@ export const problems: Problem[] = [
       "Verify DNS resolution for VPN gateway.",
       "Validate credentials.",
       "Restart VPN service.",
-      "Test reconnection."
+      "Test reconnection.",
     ],
 
-    expectedOutcome: [
-      "VPN connects successfully and authentication works."
-    ],
+    expectedOutcome: ["VPN connects successfully and authentication works."],
 
     instructions: [
       "Use ipconfig and ping.",
       "Check DNS.",
-      "Restart VPN client."
-    ]
+      "Restart VPN client.",
+    ],
   },
 
   {
@@ -171,17 +165,17 @@ export const problems: Problem[] = [
     serverRdpFile: "/rdp/5/server.rdp",
     workshopRdpFile: "/rdp/5/workstation.rdp",
     completionKey: "MAIL777",
-
+    image: "lab5.webp",
     labScenario: [
       "User reports Outlook not syncing.",
-      "Mailbox credentials or profile may be corrupted."
+      "Mailbox credentials or profile may be corrupted.",
     ],
 
     labTasks: [
       "Check Outlook connection status.",
       "Verify credentials.",
       "Restart Outlook.",
-      "Repair or recreate mail profile."
+      "Repair or recreate mail profile.",
     ],
 
     expectedOutcome: ["Mailbox sync fully restored."],
@@ -189,8 +183,8 @@ export const problems: Problem[] = [
     instructions: [
       "Go to Account Settings.",
       "Repair profile.",
-      "Confirm sync."
-    ]
+      "Confirm sync.",
+    ],
   },
 
   {
@@ -202,10 +196,10 @@ export const problems: Problem[] = [
     serverRdpFile: "/rdp/6/server.rdp",
     workshopRdpFile: "/rdp/6/workstation.rdp",
     completionKey: "FSMO444",
-
+    image: "lab6.webp",
     labScenario: [
       "Users in a remote office cannot authenticate.",
-      "Replication or FSMO failure is suspected."
+      "Replication or FSMO failure is suspected.",
     ],
 
     labTasks: [
@@ -213,19 +207,17 @@ export const problems: Problem[] = [
       "Verify DC availability.",
       "Check FSMO role owners.",
       "Force AD replication.",
-      "Test authentication again."
+      "Test authentication again.",
     ],
 
-    expectedOutcome: [
-      "Remote site authentication restored."
-    ],
+    expectedOutcome: ["Remote site authentication restored."],
 
     instructions: [
       "Run repadmin.",
       "Verify DCs.",
       "Review FSMO roles.",
-      "Trigger replication."
-    ]
+      "Trigger replication.",
+    ],
   },
 
   // -------------------------------------------------
@@ -240,28 +232,26 @@ export const problems: Problem[] = [
     serverRdpFile: "/rdp/7/server.rdp",
     workshopRdpFile: "/rdp/7/workstation.rdp",
     completionKey: "DISK999",
-
+    image: "lab7.webp",
     labScenario: [
       "Server is critically low on disk space.",
-      "Large logs and old temp files may be the cause."
+      "Large logs and old temp files may be the cause.",
     ],
 
     labTasks: [
       "Identify largest files.",
       "Run Disk Cleanup.",
       "Delete unnecessary logs.",
-      "Uninstall unused applications."
+      "Uninstall unused applications.",
     ],
 
-    expectedOutcome: [
-      "Free space restored to safe operating levels."
-    ],
+    expectedOutcome: ["Free space restored to safe operating levels."],
 
     instructions: [
       "Use File Explorer or PowerShell.",
       "Run cleanup tools.",
-      "Purge logs."
-    ]
+      "Purge logs.",
+    ],
   },
 
   {
@@ -276,14 +266,14 @@ export const problems: Problem[] = [
 
     labScenario: [
       "A workstation is missing mapped drives and restrictions.",
-      "GPO inheritance or filtering might be broken."
+      "GPO inheritance or filtering might be broken.",
     ],
 
     labTasks: [
       "Run gpresult to see applied policies.",
       "Check OU structure.",
       "Confirm correct GPO filtering.",
-      "Run gpupdate."
+      "Run gpupdate.",
     ],
 
     expectedOutcome: ["GPO applies correctly across the workstation."],
@@ -291,8 +281,8 @@ export const problems: Problem[] = [
     instructions: [
       "Review gpresult.",
       "Fix GPO scope.",
-      "Force policy update."
-    ]
+      "Force policy update.",
+    ],
   },
 
   {
@@ -307,7 +297,7 @@ export const problems: Problem[] = [
 
     labScenario: [
       "Users cannot access services requiring Kerberos.",
-      "Event Viewer logs show KRB5 and ticket errors."
+      "Event Viewer logs show KRB5 and ticket errors.",
     ],
 
     labTasks: [
@@ -315,18 +305,16 @@ export const problems: Problem[] = [
       "Check SPNs for duplicates or missing entries.",
       "Review Kerberos logs.",
       "Reset tickets using klist.",
-      "Correct SPN misconfigurations."
+      "Correct SPN misconfigurations.",
     ],
 
-    expectedOutcome: [
-      "Kerberos authentication restored across all services."
-    ],
+    expectedOutcome: ["Kerberos authentication restored across all services."],
 
     instructions: [
       "Check time skew.",
       "Review SPNs.",
       "Clear tickets with klist.",
-      "Fix SPN configuration."
-    ]
-  }
+      "Fix SPN configuration.",
+    ],
+  },
 ];

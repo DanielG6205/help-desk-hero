@@ -21,7 +21,7 @@ export default function ProblemDetail() {
 
   const problem = useMemo(
     () => problems.find((p) => p.id === problemId),
-    [problemId]
+    [problemId],
   );
 
   const done = isDone(problemId);
@@ -36,7 +36,7 @@ export default function ProblemDetail() {
   // ------------------------------
   // ACCESS CONTROL
   // ------------------------------
-  if (loading || premium === null) return null;     // Wait for Firebase
+  if (loading || premium === null) return null; // Wait for Firebase
   if (!user) return <LoginRequired />;
 
   if (!problem) {
@@ -63,7 +63,6 @@ export default function ProblemDetail() {
   return (
     <div className="min-h-screen pt-24 px-6 bg-black text-white">
       <div className="max-w-4xl mx-auto bg-white/5 border border-white/10 rounded-xl p-8 backdrop-blur-md">
-        
         {/* TITLE + LOCK IF PREMIUM */}
         <h1 className="text-4xl font-bold mb-4 flex items-center gap-3">
           <span className="bg-gradient-to-r from-teal-300 to-blue-400 text-transparent bg-clip-text">
@@ -74,6 +73,20 @@ export default function ProblemDetail() {
             <span className="text-yellow-300 text-3xl">🔒</span>
           )}
         </h1>
+
+        {problem.image && (
+          <div className="mb-8">
+            <img
+              src={
+                problem.image.startsWith("/")
+                  ? problem.image
+                  : `/${problem.image}`
+              }
+              alt={`${problem.name} preview`}
+              className="w-full rounded-lg border border-white/10 object-cover max-h-96"
+            />
+          </div>
+        )}
 
         <div className="flex flex-wrap items-center gap-4 mb-8 text-gray-300">
           <span className="px-3 py-1 rounded-full bg-white/10 border border-white/20">
@@ -117,7 +130,6 @@ export default function ProblemDetail() {
 
         {/* SECTIONS */}
         <div className="space-y-6">
-
           <div className="bg-white/5 border border-white/10 p-6 rounded-lg">
             <button
               className="text-xl font-semibold flex justify-between w-full"
@@ -168,7 +180,6 @@ export default function ProblemDetail() {
               </ul>
             )}
           </div>
-
         </div>
 
         {/* COMPLETION KEY */}
@@ -201,7 +212,6 @@ export default function ProblemDetail() {
             </div>
           )}
         </div>
-
       </div>
     </div>
   );
