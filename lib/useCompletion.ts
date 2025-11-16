@@ -8,17 +8,44 @@ import {
   setDoc,
   deleteDoc,
   collection,
-  onSnapshot
+  onSnapshot,
 } from "firebase/firestore";
 
-// Firestore completion manager
+// ------------------------------
+// 🔥 Helper: Update Public Leaderboard
+// ------------------------------
+async function updateLeaderboardEntry(
+  uid: string,
+  displayName: string | null,
+  completedCount: number
+) {
+  const name = displayName || "Anonymous";
+
+  const ref = doc(db, "leaderboard", uid);
+
+  await setDoc(
+    ref,
+    {
+      displayName: name,
+      completed: completedCount,
+      updatedAt: Date.now(),
+    },
+    { merge: true }
+  );
+}
+
+// ------------------------------
+// 🔥 MAIN HOOK
+// ------------------------------
 export function useCompletion() {
   const { user } = useAuth();
 
   // store completed IDs in a Set for fast lookup
   const [doneIds, setDoneIds] = useState<Set<number>>(new Set());
 
-  // Load the user's completion from Firestore in realtime
+  // -----------------------------------------------------
+  // 🔥 Load the user's completion from Firestore in realtime
+  // -----------------------------------------------------
   useEffect(() => {
     if (!user) {
       setDoneIds(new Set());
@@ -30,23 +57,32 @@ export function useCompletion() {
     const unsub = onSnapshot(completionRef, (snapshot) => {
       const newSet = new Set<number>();
 
-      snapshot.forEach((doc) => {
-        newSet.add(Number(doc.id));
-      });
+      snapshot.forEach((d) => newSet.add(Number(d.id)));
 
       setDoneIds(newSet);
+
+      // Every time completion changes → update leaderboard
+      updateLeaderboardEntry(
+        user.uid,
+        user.displayName || user.email?.split("@")[0] || "Anonymous",
+        newSet.size
+      );
     });
 
     return () => unsub();
   }, [user]);
 
-  // Check if a problem is done
+  // -----------------------------------------------------
+  // 🔥 Check if problem is done
+  // -----------------------------------------------------
   const isDone = useCallback(
     (id: number) => doneIds.has(id),
     [doneIds]
   );
 
-  // Toggle completion
+  // -----------------------------------------------------
+  // 🔥 Toggle completion + update leaderboard
+  // -----------------------------------------------------
   const setDone = useCallback(
     async (id: number, done: boolean) => {
       if (!user) return;
@@ -54,12 +90,12 @@ export function useCompletion() {
       const ref = doc(db, "users", user.uid, "completion", String(id));
 
       if (done) {
-        // mark as completed
         await setDoc(ref, { done: true });
       } else {
-        // remove completion
         await deleteDoc(ref);
       }
+
+      // Leaderboard is auto-updated by snapshot listener above
     },
     [user]
   );
@@ -67,6 +103,6 @@ export function useCompletion() {
   return {
     isDone,
     setDone,
-    doneIds
+    doneIds,
   };
 }

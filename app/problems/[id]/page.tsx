@@ -8,21 +8,23 @@ import { useAuth } from "@/app/components/fb/AuthContent";
 import LoginRequired from "@/app/components/fb/LoginRequired";
 
 export default function ProblemDetail() {
+  // 🔥 ALL HOOKS MUST BE AT THE TOP — ALWAYS RUN
   const { user, loading } = useAuth();
   const { isDone, setDone } = useCompletion();
   const params = useParams<{ id: string }>();
   const router = useRouter();
 
-  // AUTH GATE
-  if (loading) return null;
-  if (!user) return <LoginRequired />;
-
+  // Now it's SAFE to use values
   const problemId = Number(params.id);
 
   const problem = useMemo(
     () => problems.find((p) => p.id === problemId),
     [problemId]
   );
+
+  // 🔥 AUTH + 404 CHECKS MUST COME AFTER HOOKS
+  if (loading) return null;
+  if (!user) return <LoginRequired />;
 
   if (!problem) {
     router.replace("/problems");
@@ -35,6 +37,7 @@ export default function ProblemDetail() {
     await setDone(problemId, !done);
   }
 
+  // 🔥 SAFE — No hook order changes below this point
   return (
     <div className="min-h-screen pt-24 px-6 bg-black text-white">
       <div className="max-w-4xl mx-auto bg-white/5 border border-white/10 rounded-xl p-8 backdrop-blur-md">
