@@ -25,8 +25,8 @@ export default function SignupPage() {
 
             <p className="text-center text-gray-300 mt-2">
               Continue to{" "}
-              <Link href="/problems" className="text-teal-400 underline">
-                problems
+              <Link href="/labs" className="text-teal-400 underline">
+                labs
               </Link>
             </p>
 

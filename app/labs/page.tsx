@@ -196,7 +196,7 @@ export default function ProblemsPage() {
 
             return (
               <Link
-                href={isLocked ? "/premium" : `/problems/${problem.id}`}
+                href={isLocked ? "/premium" : `/labs/${problem.id}`}
                 key={problem.id}
               >
                 <ProblemCard

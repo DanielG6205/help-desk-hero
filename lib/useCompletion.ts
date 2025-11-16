@@ -1,134 +1,118 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState } from "react";
+import { db } from "@/lib/firebase";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import { useAuth } from "@/app/components/fb/AuthContent";
-import { db } from "./firebase";
-import {
-  doc,
-  setDoc,
-  deleteDoc,
-  collection,
-  onSnapshot,
-  getDocs,
-} from "firebase/firestore";
+import { usePremium } from "@/lib/usePremium";
+import { updateStreak } from "@/lib/updateStreak";
 
-// ------------------------------
-// 🔥 Helper: Update Public Leaderboard
-// ------------------------------
-async function updateLeaderboardEntry(
-  uid: string,
-  displayName: string | null,
-  completedCount: number
-) {
-  const name = displayName || "Anonymous";
-
-  const ref = doc(db, "leaderboard", uid);
-
-  await setDoc(
-    ref,
-    {
-      displayName: name,
-      completed: completedCount,
-      updatedAt: Date.now(),
-    },
-    { merge: true }
-  );
-}
-
-// ------------------------------
-// 🔥 MAIN HOOK
-// ------------------------------
 export function useCompletion() {
   const { user } = useAuth();
+  const premium = usePremium();
 
   const [doneIds, setDoneIds] = useState<Set<number>>(new Set());
 
-  // -----------------------------------------------------
-  // 🔥 Load the user's completion from Firestore in realtime
-  // -----------------------------------------------------
+  // ---------------------------------------------------------------------------
+  // LOAD USER PROGRESS FROM FIRESTORE
+  // ---------------------------------------------------------------------------
   useEffect(() => {
-    if (!user) {
-      setDoneIds(new Set());
-      return;
+    async function load() {
+      if (!user) return;
+
+      const ref = doc(db, "users", user.uid);
+      const snap = await getDoc(ref);
+
+      if (snap.exists()) {
+        const d = snap.data();
+        setDoneIds(new Set(d.doneIds || []));
+      }
     }
 
-    const completionRef = collection(db, "users", user.uid, "completion");
-
-    const unsub = onSnapshot(completionRef, (snapshot) => {
-      const newSet = new Set<number>();
-
-      snapshot.forEach((d) => newSet.add(Number(d.id)));
-
-      setDoneIds(newSet);
-
-      // Update leaderboard automatically
-      updateLeaderboardEntry(
-        user.uid,
-        user.displayName || user.email?.split("@")[0] || "Anonymous",
-        newSet.size
-      );
-    });
-
-    return () => unsub();
+    load();
   }, [user]);
 
-  // -----------------------------------------------------
-  // 🔥 Check if problem is done
-  // -----------------------------------------------------
-  const isDone = useCallback(
-    (id: number) => doneIds.has(id),
-    [doneIds]
-  );
+  // ---------------------------------------------------------------------------
+  // MARK PROBLEM DONE / UNDONE
+  // ---------------------------------------------------------------------------
+  async function setDone(id: number, value: boolean) {
+    if (!user) return;
 
-  // -----------------------------------------------------
-  // 🔥 Toggle completion + update leaderboard
-  // -----------------------------------------------------
-  const setDone = useCallback(
-    async (id: number, done: boolean) => {
-      if (!user) return;
+    const newSet = new Set(doneIds);
 
-      const ref = doc(db, "users", user.uid, "completion", String(id));
+    if (value) newSet.add(id);
+    else newSet.delete(id);
 
-      if (done) {
-        await setDoc(ref, { done: true });
-      } else {
-        await deleteDoc(ref);
-      }
+    setDoneIds(newSet);
 
-      // Leaderboard auto-updates via snapshot above
-    },
-    [user]
-  );
+    const completedCount = newSet.size;
 
-  // -----------------------------------------------------
-  // Reset ALL progress (delete all completion docs)
-  // -----------------------------------------------------
-  const resetAll = useCallback(
-    async () => {
-      if (!user) return;
+    // Update user document
+    await setDoc(
+      doc(db, "users", user.uid),
+      { doneIds: Array.from(newSet) },
+      { merge: true }
+    );
 
-      const completionRef = collection(db, "users", user.uid, "completion");
+    // -------------------------------------------------------------------------
+    // UPDATE LEADERBOARD ENTRY
+    // -------------------------------------------------------------------------
+    await setDoc(
+      doc(db, "leaderboard", user.uid),
+      {
+        displayName: user.displayName || user.email?.split("@")[0] || "User",
+        completed: completedCount,
+        updatedAt: Date.now(),
+      },
+      { merge: true }
+    );
 
-      const snapshot = await getDocs(completionRef);
+    // -------------------------------------------------------------------------
+    // UPDATE STREAK / STREAK FREEZE
+    // -------------------------------------------------------------------------
+    const isPremium =
+      premium === "monthly" || premium === "yearly";
 
-      // Delete each completion document
-      const deletions: Promise<any>[] = [];
-      snapshot.forEach((docItem) => {
-        deletions.push(deleteDoc(docItem.ref));
-      });
+    await updateStreak(user.uid, isPremium);
+  }
 
-      await Promise.all(deletions);
+  // ---------------------------------------------------------------------------
+  // CHECK IF USER COMPLETED A PROBLEM
+  // ---------------------------------------------------------------------------
+  function isDone(id: number) {
+    return doneIds.has(id);
+  }
 
-      // Local state reset
-      setDoneIds(new Set());
-    },
-    [user]
-  );
+  // ---------------------------------------------------------------------------
+  // RESET ALL PROGRESS (Used in Settings)
+  // ---------------------------------------------------------------------------
+  async function resetAll() {
+    if (!user) return;
 
-  return {
-    isDone,
-    setDone,
-    doneIds,
-    resetAll, // ← added here
-  };
+    setDoneIds(new Set());
+
+    await setDoc(
+      doc(db, "users", user.uid),
+      {
+        doneIds: [],
+        streak: 0,
+        lastSolvedDate: null,
+        streakFreezeAvailable: true,
+        streakFreezeUsedOn: null,
+      },
+      { merge: true }
+    );
+
+    // Leaderboard reset
+    await setDoc(
+      doc(db, "leaderboard", user.uid),
+      {
+        completed: 0,
+        updatedAt: Date.now(),
+      },
+      { merge: true }
+    );
+  }
+
+  return { isDone, setDone, doneIds, resetAll };
 }

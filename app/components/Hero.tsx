@@ -32,6 +32,7 @@ export default function Hero() {
     typeof window !== "undefined" &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  // Track scroll for fade/blur ONLY
   useEffect(() => {
     function computeProgress() {
       if (!heroRef.current) return 0;
@@ -60,23 +61,21 @@ export default function Hero() {
 
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
-
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   const fadeOut = 1 - progress * 1.15;
   const blurAmount = progress * 8;
-  const heroDrift = progress * 32;
   const parallaxRise = progress * 60;
 
   const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 
+  // NO SCROLL MOVEMENT, ONLY FADE + BLUR
   const headingStyle = reduceMotion
     ? {}
     : {
         opacity: clamp01(fadeOut),
         filter: `blur(${blurAmount}px)`,
-        transform: `translateY(${progress * 25}px)`,
       };
 
   const paragraphStyle = reduceMotion
@@ -84,14 +83,10 @@ export default function Hero() {
     : {
         opacity: clamp01(fadeOut),
         filter: `blur(${blurAmount}px)`,
-        transform: `translateY(${progress * 20}px)`,
       };
 
-  const pinnedHeroStyle = reduceMotion
-    ? {}
-    : {
-        transform: `translateY(${heroDrift}px)`,
-      };
+  // No drift — stays fixed size + position
+  const pinnedHeroStyle = {};
 
   const parallaxGroupStyle = reduceMotion
     ? {}
@@ -114,7 +109,7 @@ export default function Hero() {
         text-[clamp(12px,1.1vw,16px)]
       "
     >
-      {/* BG */}
+      {/* Background */}
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{
@@ -123,13 +118,14 @@ export default function Hero() {
           filter: "brightness(0.75)",
         }}
       />
-
       <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/70 to-black/85" />
-      <div className="absolute inset-0 opacity-[0.07]
+      <div
+        className="absolute inset-0 opacity-[0.07]
         bg-[linear-gradient(to_right,#fff_1px,transparent_1px),linear-gradient(to_bottom,#fff_1px,transparent_1px)]
-        bg-[size:40px_40px] pointer-events-none" />
+        bg-[size:40px_40px] pointer-events-none"
+      />
 
-      {/* RESPONSIVE SCALE CONTAINER */}
+      {/* CONTENT */}
       <div
         className="
           sticky top-0 h-screen
@@ -137,7 +133,6 @@ export default function Hero() {
           px-[clamp(1rem,4vw,8rem)]
           py-[clamp(2rem,4vw,5rem)]
         "
-        style={{ transform: `scale(${clamp01(1 - progress * 0.1)})` }} // subtle shrink on scroll
       >
         {/* TOP TEXT */}
         <div className="mt-10">
@@ -177,7 +172,7 @@ export default function Hero() {
           <div className="border-t border-white/60 mt-6" />
         </div>
 
-        {/* MIDDLE CONTENT */}
+        {/* MIDDLE TEXT */}
         <div style={parallaxGroupStyle}>
           <p
             className="
@@ -206,7 +201,7 @@ export default function Hero() {
             </Link>
 
             <Link
-              href="/problems"
+              href="/labs"
               className="
                 px-[clamp(1rem,2.4vw,1.6rem)]
                 py-[clamp(0.5rem,1.1vw,0.9rem)]
@@ -220,7 +215,7 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* LOGO CAROUSEL */}
+        {/* TECHNOLOGY LOGO LOOP */}
         <div
           className="pb-[clamp(0.5rem,2vw,2rem)] w-full"
           style={carouselStyle}
@@ -233,7 +228,7 @@ export default function Hero() {
             logos={techLogos}
             speed={50}
             direction="left"
-            logoHeight={40} // smaller logos for mobile
+            logoHeight={40}
             gap={50}
             hoverSpeed={0}
             scaleOnHover

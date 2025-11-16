@@ -3,16 +3,16 @@
 import { useAuth } from "@/app/components/fb/AuthContent";
 import LoginRequired from "@/app/components/fb/LoginRequired";
 import { useCompletion } from "@/lib/useCompletion";
-import { problems } from "../problems/index";
+import { problems } from "../labs/index";
 import { useEffect, useState } from "react";
-import { collection, getDocs, doc, setDoc } from "firebase/firestore";
+import { collection, getDocs, getDoc, doc, setDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import Link from "next/link";
 
 import { motion } from "framer-motion";
-import { Award, User, Target, Crown } from "lucide-react";
+import { Award, User, Target, Crown, Flame, Snowflake } from "lucide-react";
+import { usePremium } from "@/lib/usePremium";
 
-// Leaderboard type
 type LeaderboardEntry = {
   displayName: string;
   completed: number;
@@ -23,14 +23,19 @@ type LeaderboardEntry = {
 export default function AccountPage() {
   const { user, loading } = useAuth();
   const { doneIds } = useCompletion();
+  const premium = usePremium();
 
   const [leaders, setLeaders] = useState<LeaderboardEntry[]>([]);
   const [rank, setRank] = useState<number | null>(null);
 
+  const [streak, setStreak] = useState(0);
+  const [freezeAvailable, setFreezeAvailable] = useState(false);
+  const [freezeUsedOn, setFreezeUsedOn] = useState<string | null>(null);
+
   const totalProblems = problems.length;
   const solved = doneIds.size;
 
-  // LOAD LEADERBOARD + RANK
+  // Load leaderboard + rank
   useEffect(() => {
     async function loadLeaderboard() {
       const snap = await getDocs(collection(db, "leaderboard"));
@@ -40,19 +45,31 @@ export default function AccountPage() {
         uid: d.id,
       }));
 
-      // sort by problems completed
       data.sort((a, b) => b.completed - a.completed);
-
       setLeaders(data);
 
       const index = data.findIndex((entry) => entry.uid === user?.uid);
-
-      if (index !== -1) setRank(index + 1);
-      else setRank(null);
+      setRank(index !== -1 ? index + 1 : null);
     }
 
     if (user) loadLeaderboard();
   }, [user, doneIds]);
+
+  // Load streak & freeze
+  useEffect(() => {
+    async function loadStreak() {
+      if (!user) return;
+
+      const snap = await getDoc(doc(db, "users", user.uid));
+      if (!snap.exists()) return;
+
+      const data = snap.data();
+      setStreak(data?.streak || 0);
+      setFreezeAvailable(data?.streakFreezeAvailable ?? false);
+      setFreezeUsedOn(data?.streakFreezeUsedOn || null);
+    }
+    loadStreak();
+  }, [user]);
 
   if (loading) return null;
   if (!user) return <LoginRequired />;
@@ -74,7 +91,7 @@ export default function AccountPage() {
           </h1>
         </div>
 
-        {/* USER */}
+        {/* USER INFO */}
         <div className="bg-white/5 p-6 rounded-xl border border-white/10 mb-10">
           <h2 className="text-2xl font-semibold mb-1">{displayName}</h2>
           <p className="text-gray-300">{user.email}</p>
@@ -88,7 +105,8 @@ export default function AccountPage() {
           </div>
 
           <p className="text-gray-300 mb-3">
-            <span className="text-teal-300 font-bold text-lg">{solved}</span> / {totalProblems}
+            <span className="text-teal-300 font-bold text-lg">{solved}</span> /{" "}
+            {totalProblems}
           </p>
 
           <div className="w-full h-4 bg-white/10 rounded-full overflow-hidden">
@@ -97,6 +115,55 @@ export default function AccountPage() {
               style={{ width: `${(solved / totalProblems) * 100}%` }}
             />
           </div>
+        </div>
+
+        {/* DAILY STREAK */}
+        <div className="bg-white/5 p-6 rounded-xl border border-white/10 mb-10">
+          <h3 className="text-xl font-semibold flex items-center gap-2">
+            <Flame className="w-6 h-6 text-orange-400" />
+            Daily Streak
+          </h3>
+          <p className="text-gray-300 text-lg mt-2">
+            <span className="text-orange-300 font-bold">{streak}</span> days
+          </p>
+
+          <Link
+            href="/streakboard"
+            className="text-sm text-orange-300 underline mt-3 block"
+          >
+            View the full streakboard →
+          </Link>
+        </div>
+
+        {/* STREAK FREEZE */}
+        <div className="bg-white/5 p-6 rounded-xl border border-white/10 mb-10">
+          <h3 className="text-xl font-semibold flex items-center gap-2">
+            <Snowflake className="w-6 h-6 text-blue-300" />
+            Streak Freeze
+          </h3>
+
+          {premium !== "free" ? (
+            <>
+              {freezeAvailable ? (
+                <p className="text-green-300 font-semibold mt-2">
+                  ❄️ Your streak is protected today.
+                </p>
+              ) : (
+                <p className="text-red-400 font-semibold mt-2">
+                  You used your freeze today.
+                </p>
+              )}
+              {freezeUsedOn && (
+                <p className="text-gray-400 text-sm mt-2">
+                  Last used: {freezeUsedOn}
+                </p>
+              )}
+            </>
+          ) : (
+            <p className="text-gray-400 mt-2">
+              Upgrade to Premium to get daily streak freeze protection!
+            </p>
+          )}
         </div>
 
         {/* LEADERBOARD RANK */}
@@ -109,7 +176,9 @@ export default function AccountPage() {
           {rank ? (
             <p className="text-gray-300">
               You are currently{" "}
-              <span className="text-yellow-300 font-bold text-xl">#{rank}</span>{" "}
+              <span className="text-yellow-300 font-bold text-xl">
+                #{rank}
+              </span>{" "}
               out of {leaders.length} users.
             </p>
           ) : (
@@ -157,7 +226,9 @@ export default function AccountPage() {
                   <span className="text-2xl font-bold w-8 text-center">
                     {index + 1}
                   </span>
-                  <span className="text-lg font-medium">{entry.displayName}</span>
+                  <span className="text-lg font-medium">
+                    {entry.displayName}
+                  </span>
                 </div>
 
                 <span className="text-xl font-semibold text-cyan-300">
@@ -190,15 +261,14 @@ function PremiumStatus({ user }: { user: any }) {
   const [premium, setPremium] = useState<"free" | "monthly" | "yearly">("free");
   const [updatedAt, setUpdatedAt] = useState<string | null>(null);
 
-  // LOAD FROM FIRESTORE
   useEffect(() => {
     async function load() {
-      const snap = await getDocs(collection(db, "users"));
-      const docData = snap.docs.find((d) => d.id === user.uid)?.data();
+      const snap = await getDoc(doc(db, "users", user.uid));
+      const data = snap.data();
 
-      if (docData) {
-        setPremium(docData.premium || "free");
-        setUpdatedAt(docData.premiumUpdatedAt || null);
+      if (data) {
+        setPremium(data.premium || "free");
+        setUpdatedAt(data.premiumUpdatedAt || null);
       }
 
       setLoading(false);
@@ -208,10 +278,8 @@ function PremiumStatus({ user }: { user: any }) {
   }, [user]);
 
   const cancelPremium = async () => {
-    const ref = doc(db, "users", user.uid);
-
     await setDoc(
-      ref,
+      doc(db, "users", user.uid),
       {
         premium: "free",
         premiumUpdatedAt: new Date().toISOString(),
@@ -249,7 +317,9 @@ function PremiumStatus({ user }: { user: any }) {
         </>
       ) : (
         <>
-          <p className="text-gray-300 mb-3">You are currently on the Free Plan.</p>
+          <p className="text-gray-300 mb-3">
+            You are currently on the Free Plan.
+          </p>
 
           <Link
             href="/premium"

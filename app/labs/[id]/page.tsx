@@ -40,7 +40,7 @@ export default function ProblemDetail() {
   if (!user) return <LoginRequired />;
 
   if (!problem) {
-    router.replace("/problems");
+    router.replace("/labs");
     return null;
   }
 
@@ -111,7 +111,7 @@ export default function ProblemDetail() {
             download
             className="px-6 py-3 bg-purple-600 hover:bg-purple-700 rounded-lg font-medium"
           >
-            Download Workshop RDP
+            Download Workstation RDP
           </a>
         </div>
 
@@ -197,7 +197,7 @@ export default function ProblemDetail() {
             </>
           ) : (
             <div className="text-emerald-400 text-lg font-semibold">
-              ✓ Problem Completed
+              ✓ Lab Completed
             </div>
           )}
         </div>

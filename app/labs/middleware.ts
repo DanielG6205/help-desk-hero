@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export const config = {
-  matcher: ["/problems/:path*"],
+  matcher: ["/labs/:path*"],
 };
 
 export function middleware(req: NextRequest) {

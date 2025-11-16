@@ -52,7 +52,7 @@ export default function Navbar() {
         <div className="hidden md:flex gap-10 text-gray-200 items-center">
 
           {/* Page Links */}
-          {["Leaderboard", "Problems", "About", "Learn"].map((item) => (
+          {["Leaderboard", "Labs", "About", "Learn"].map((item) => (
             <Link
               key={item}
               href={`/${item.toLowerCase()}`}
