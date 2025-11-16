@@ -9,6 +9,7 @@ import {
   deleteDoc,
   collection,
   onSnapshot,
+  getDocs,
 } from "firebase/firestore";
 
 // ------------------------------
@@ -40,7 +41,6 @@ async function updateLeaderboardEntry(
 export function useCompletion() {
   const { user } = useAuth();
 
-  // store completed IDs in a Set for fast lookup
   const [doneIds, setDoneIds] = useState<Set<number>>(new Set());
 
   // -----------------------------------------------------
@@ -61,7 +61,7 @@ export function useCompletion() {
 
       setDoneIds(newSet);
 
-      // Every time completion changes → update leaderboard
+      // Update leaderboard automatically
       updateLeaderboardEntry(
         user.uid,
         user.displayName || user.email?.split("@")[0] || "Anonymous",
@@ -95,7 +95,32 @@ export function useCompletion() {
         await deleteDoc(ref);
       }
 
-      // Leaderboard is auto-updated by snapshot listener above
+      // Leaderboard auto-updates via snapshot above
+    },
+    [user]
+  );
+
+  // -----------------------------------------------------
+  // Reset ALL progress (delete all completion docs)
+  // -----------------------------------------------------
+  const resetAll = useCallback(
+    async () => {
+      if (!user) return;
+
+      const completionRef = collection(db, "users", user.uid, "completion");
+
+      const snapshot = await getDocs(completionRef);
+
+      // Delete each completion document
+      const deletions: Promise<any>[] = [];
+      snapshot.forEach((docItem) => {
+        deletions.push(deleteDoc(docItem.ref));
+      });
+
+      await Promise.all(deletions);
+
+      // Local state reset
+      setDoneIds(new Set());
     },
     [user]
   );
@@ -104,5 +129,6 @@ export function useCompletion() {
     isDone,
     setDone,
     doneIds,
+    resetAll, // ← added here
   };
 }
