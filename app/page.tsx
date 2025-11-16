@@ -1,6 +1,14 @@
 import Image from "next/image";
 import Hero from "./components/Hero";
 import Info from "./components/Info";
+import LogoCarousel from "./components/LogoCarousel";
+import {
+  Firebase,
+  Zed,
+  Vercel,
+  ReactLogo,
+  MicrosoftAzure,
+} from "./components/LogoIcons";
 
 export default function Home() {
   return (
@@ -9,6 +17,6 @@ export default function Home() {
       <div className="w-full">
         <Info />
       </div>
-    </div>  
+    </div>
   );
 }

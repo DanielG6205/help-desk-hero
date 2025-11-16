@@ -3,6 +3,44 @@
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
+import LogoLoop from "@/components/LogoLoop";
+import {
+  SiReact,
+  SiFirebase,
+  SiNextdotjs,
+  SiFigma,
+  SiTypescript,
+  SiTailwindcss,
+  SiVercel,
+} from "react-icons/si";
+
+const techLogos = [
+  { node: <SiReact />, title: "React", href: "https://react.dev" },
+
+  { node: <SiVercel />, title: "Vercel", href: "https://vercel.com" },
+  { node: <SiNextdotjs />, title: "Next.js", href: "https://nextjs.org" },
+  {
+    node: <SiFigma />,
+    title: "Figma",
+    href: "https://www.figma.com",
+  },
+  {
+    node: <SiFirebase />,
+    title: "Firebase",
+    href: "https://firebase.google.com",
+  },
+  {
+    node: <SiTypescript />,
+    title: "TypeScript",
+    href: "https://www.typescriptlang.org",
+  },
+
+  {
+    node: <SiTailwindcss />,
+    title: "Tailwind CSS",
+    href: "https://tailwindcss.com",
+  },
+];
 /**
  * Scroll‑linked Hero section.
  *
@@ -34,7 +72,9 @@ export default function Hero() {
       const scrollY = window.scrollY;
       // Portion where sticky is active: heroHeight - viewportHeight
       const scrollable = Math.max(heroHeight - viewportHeight, 1);
+
       const raw = (scrollY - heroTop) / scrollable;
+      console.log(raw);
       return Math.min(1, Math.max(0, raw));
     }
 
@@ -67,6 +107,9 @@ export default function Hero() {
 
   // Derived animation values
   const fadeOut = 1 - progress * 1.15; // Can go below 0; clamp in styles
+  const lastFadeIn = reduceMotion
+    ? 1
+    : Math.min(1, Math.max(0, (progress - 0.95) / 0.05));
   const blurAmount = progress * 8; // px
   const heroDrift = progress * 32; // px downward movement for "Be a Hero"
   const miniSectionDrift = progress; // px downward movement for mini-section
@@ -79,36 +122,43 @@ export default function Hero() {
   const headingStyle: React.CSSProperties = reduceMotion
     ? {}
     : {
-      opacity: clamp01(fadeOut),
-      filter: `blur(${blurAmount.toFixed(2)}px)`,
-      transform: `translateY(${(progress * 25).toFixed(2)}px)`,
-    };
+        opacity: clamp01(fadeOut),
+        filter: `blur(${blurAmount.toFixed(2)}px)`,
+        transform: `translateY(${(progress * 25).toFixed(2)}px)`,
+      };
 
   const paragraphStyle: React.CSSProperties = reduceMotion
     ? {}
     : {
-      opacity: clamp01(fadeOut),
-      filter: `blur(${blurAmount.toFixed(2)}px)`,
-      transform: `translateY(${(progress * 20).toFixed(2)}px)`,
-    };
+        opacity: clamp01(fadeOut),
+        filter: `blur(${blurAmount.toFixed(2)}px)`,
+        transform: `translateY(${(progress * 20).toFixed(2)}px)`,
+      };
 
   const pinnedHeroStyle: React.CSSProperties = reduceMotion
     ? {}
     : {
-      transform: `translateY(${heroDrift.toFixed(2)}px)`,
-    };
+        transform: `translateY(${heroDrift.toFixed(2)}px)`,
+      };
 
   const miniSectionStyle: React.CSSProperties = reduceMotion
     ? {}
     : {
-      transform: `translateY(${miniSectionDrift.toFixed(2)}px)`,
-    };
+        transform: `translateY(${miniSectionDrift.toFixed(2)}px)`,
+      };
 
   const parallaxGroupStyle: React.CSSProperties = reduceMotion
     ? {}
     : {
-      transform: `translateY(${(-parallaxRise).toFixed(2)}px)`,
-    };
+        transform: `translateY(${(-parallaxRise).toFixed(2)}px)`,
+      };
+
+  const carouselStyle: React.CSSProperties = reduceMotion
+    ? {}
+    : {
+        opacity: lastFadeIn,
+        transform: `translateY(${(-parallaxRise).toFixed(2)}px)`,
+      };
 
   return (
     <section
@@ -207,10 +257,25 @@ export default function Hero() {
             </div>
           </div>
         </div>
-
-        {/* Optional progress indicator for debugging (hidden by default) */}
-        <div className="absolute bottom-4 right-6 text-xs text-white/40 select-none hidden">
-          progress: {(progress * 100).toFixed(1)}%
+        <div
+          className="absolute inset-x-0 bottom-0 px-10 md:px-24 lg:px-32 pb-10 z-10 transition-[opacity,transform] duration-300"
+          style={carouselStyle}
+        >
+          <p className="text-xs uppercase tracking-[0.28em] text-white/60 mb-3">
+            Made with:
+          </p>
+          <div className="w-full overflow-hidden">
+            <LogoLoop
+              logos={techLogos}
+              speed={60}
+              direction="left"
+              logoHeight={48}
+              gap={60}
+              hoverSpeed={0}
+              scaleOnHover
+              ariaLabel="Technology partners"
+            />
+          </div>
         </div>
       </div>
     </section>
