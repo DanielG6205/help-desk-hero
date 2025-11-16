@@ -4,7 +4,7 @@
 import { useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { problems } from "../index";
-import { useCompletion } from "../lib/useCompletion";
+import { useCompletion } from "../../../lib/useCompletion";
 
 export default function ProblemDetail() {
   const params = useParams<{ id: string }>();

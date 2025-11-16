@@ -1,19 +1,17 @@
 "use client";
 
-import GoogleLoginButton from "../components/fb/GoogleLoginButton";
-import EmailPasswordLogin from "../components/fb/EmailPasswordLogin";
+import EmailPasswordSignup from "../components/fb/EmailPasswordSignup";
 import Link from "next/link";
 import { useAuth } from "../components/fb/AuthContent";
 import LogoutButton from "../components/fb/LogoutButton";
 
-export default function LoginPage() {
+export default function SignupPage() {
   const { user, loading } = useAuth();
 
   if (loading) return null;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-black text-white px-4">
-
       <div className="w-full max-w-md bg-white/10 border border-white/20 backdrop-blur-xl rounded-2xl p-10 shadow-2xl">
 
         {user ? (
@@ -21,8 +19,11 @@ export default function LoginPage() {
             <h1 className="text-3xl font-bold text-center mb-4">
               You are already logged in 🔒
             </h1>
-
             <p className="text-center text-gray-300">
+              You already have an account and are signed in.
+            </p>
+
+            <p className="text-center text-gray-300 mt-2">
               Continue to{" "}
               <Link href="/problems" className="text-teal-400 underline">
                 problems
@@ -34,35 +35,24 @@ export default function LoginPage() {
           </>
         ) : (
           <>
-            <h1 className="text-4xl font-extrabold text-center mb-2">Welcome Back</h1>
+            <h1 className="text-4xl font-extrabold text-center mb-2">
+              Create Account
+            </h1>
             <p className="text-gray-300 text-center mb-8">
-              Sign in to continue your helpdesk training.
+              Join HelpDeskHero and start mastering real-world IT scenarios.
             </p>
 
-            {/* Social Login */}
-            <div className="space-y-4 mb-6 flex flex-col items-center">
-              <GoogleLoginButton />
-            </div>
+            <EmailPasswordSignup />
 
-            {/* Divider */}
-            <div className="flex items-center gap-4 mb-6">
-              <div className="flex-1 h-[1px] bg-gray-600" />
-              <span className="text-gray-400 text-sm">OR</span>
-              <div className="flex-1 h-[1px] bg-gray-600" />
-            </div>
-
-            {/* Email Login */}
-            <EmailPasswordLogin />
-
-            {/* Link to Sign Up */}
             <p className="text-center text-gray-400 mt-6">
-              Don’t have an account?{" "}
-              <Link href="/signup" className="text-teal-400 underline">
-                Create one
+              Already have an account?{" "}
+              <Link href="/login" className="text-teal-400 underline">
+                Sign in
               </Link>
             </p>
           </>
         )}
+
       </div>
     </div>
   );

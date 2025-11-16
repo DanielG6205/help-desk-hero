@@ -24,13 +24,13 @@ export default function Hero() {
 
       {/* Hero content */}
       <div className="relative z-10 flex h-full flex-col items-start justify-center text-left px-34 text-white">
-        <h1 className="text-7xl font-extrabold tracking-wide drop-shadow-lg text-white">
-          Practice helpdesk work.
-        </h1>
-        <h1 className="text-7xl font-extrabold tracking-wide drop-shadow-lg text-white mt-2">
+        <h1 className="text-6xl font-extrabold tracking-wide drop-shadow-lg text-white">
+          Practice help desk work.
+        </h1> 
+        <h1 className="text-6xl font-extrabold tracking-wide drop-shadow-lg text-white mt-2">
           Troubleshoot real computers.
         </h1>
-        <h1 className="text-7xl font-extrabold tracking-wide drop-shadow-lg mt-2">
+        <h1 className="text-6xl font-extrabold tracking-wide drop-shadow-lg mt-2">
           Be a{" "}
           <span className="inline-block bg-gradient-to-r from-teal-300 via-cyan-400 to-blue-400 text-transparent bg-clip-text animate-gradient-x bg-[length:200%_auto]">
             Hero

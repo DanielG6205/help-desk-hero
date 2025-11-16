@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import ProblemCard from "./ProblemCard";
 import { problems } from "./index";
-import { useCompletion } from "./lib/useCompletion";
+import { useCompletion } from "../../lib/useCompletion";
 
 const difficulties = ["Easy", "Medium", "Hard"] as const;
 const skillsList = [
