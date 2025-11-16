@@ -231,7 +231,7 @@ function PremiumStatus({ user }: { user: any }) {
       {premium !== "free" ? (
         <>
           <p className="text-green-400 font-semibold text-lg">
-            ✔ You are a Premium Member!
+            You are a Premium Member!
           </p>
 
           {updatedAt && (

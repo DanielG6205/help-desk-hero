@@ -7,12 +7,6 @@ export default function AboutPage() {
       link: "https://www.linkedin.com/in/dara-adedeji-ba4047241/"
     },
     {
-      name: "Aidan Barbosa",
-      role: "Co-Founder",
-      img: "https://api.dicebear.com/7.x/shapes/svg?seed=Alex",
-      link: "https://www.linkedin.com/in/aidanbarbosa/"
-    },
-    {
       name: "Noah Morra",
       role: "Co-Founder",
       img: "https://api.dicebear.com/7.x/shapes/svg?seed=Maya",
@@ -23,6 +17,12 @@ export default function AboutPage() {
       role: "Co-Founder",
       img: "https://api.dicebear.com/7.x/shapes/svg?seed=Chris",
       link: "https://www.linkedin.com/in/danielhgao/"
+    },
+    {
+      name: "Aidan Barbosa",
+      role: "Co-Founder",
+      img: "https://api.dicebear.com/7.x/shapes/svg?seed=Alex",
+      link: "https://www.linkedin.com/in/aidanbarbosa/"
     },
   ];
 
