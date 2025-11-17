@@ -2,25 +2,25 @@ export default function AboutPage() {
   const founders = [
     {
       name: "Dara Adedeji",
-      role: "Co-Founder - WebDev",
+      role: "Full-Stack Engineer",
       img: "https://api.dicebear.com/7.x/shapes/svg?seed=Daniel",
       link: "https://www.linkedin.com/in/dara-adedeji-ba4047241/"
     },
     {
       name: "Noah Morra",
-      role: "Co-Founder - Cloud Infrastructure Engineer / Techincal Lab Engineer",
+      role: "Cloud Infrastructure Engineer / Techincal Lab Engineer",
       img: "https://api.dicebear.com/7.x/shapes/svg?seed=Maya",
       link: "https://www.linkedin.com/in/noah-morra-920a88272/"
     },
     {
       name: "Daniel Gao",
-      role: "Co-Founder - WebDev",
+      role: "Full-Stack Engineer",
       img: "https://api.dicebear.com/7.x/shapes/svg?seed=Chris",
       link: "https://www.linkedin.com/in/danielhgao/"
     },
     {
       name: "Aidan Barbosa",
-      role: "Co-Founder - Project Manager",
+      role: "Project Manager",
       img: "https://api.dicebear.com/7.x/shapes/svg?seed=Alex",
       link: "https://www.linkedin.com/in/aidanbarbosa/"
     },
