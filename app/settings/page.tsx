@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { updateProfile, deleteUser } from "firebase/auth";
-import { useAuth } from "@/app/components/fb/AuthContent";
-import LoginRequired from "@/app/components/fb/LoginRequired";
+import { useAuth } from "@/components/fb/AuthContent";
+import LoginRequired from "@/components/Login/LoginRequired";
 import { auth } from "@/lib/firebase";
 import { useCompletion } from "@/lib/useCompletion";
 

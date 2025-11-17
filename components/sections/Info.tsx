@@ -54,7 +54,7 @@ export default function Info() {
           <div className="relative h-[320px] w-full overflow-hidden rounded-3xl border border-white/10 bg-white/5 shadow-xl transition-transform duration-500 lg:h-full">
             {/* Replace the src below with the final animated WEBP asset when available */}
             <Image
-              src="/computer.webp"
+              src="/home/computer.webp"
               fill
               className="h-full w-full object-cover"
               alt="Animated preview of Help Desk Hero in action"

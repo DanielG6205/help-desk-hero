@@ -1,14 +1,14 @@
 import Image from "next/image";
-import Hero from "./components/Hero";
-import Info from "./components/Info";
-import LogoCarousel from "./components/LogoCarousel";
+import Hero from "../components/sections/Hero";
+import Info from "../components/sections/Info";
+import LogoCarousel from "../components/LogoLoop/LogoCarousel";
 import {
   Firebase,
   Zed,
   Vercel,
   ReactLogo,
   MicrosoftAzure,
-} from "./components/LogoIcons";
+} from "../components/LogoLoop/LogoIcons";
 
 export default function Home() {
   return (

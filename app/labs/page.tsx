@@ -5,8 +5,8 @@ import Link from "next/link";
 import ProblemCard from "./ProblemCard";
 import { problems } from "./index";
 import { useCompletion } from "../../lib/useCompletion";
-import { useAuth } from "../components/fb/AuthContent";
-import LoginRequired from "../components/fb/LoginRequired";
+import { useAuth } from "../../components/fb/AuthContent";
+import LoginRequired from "../../components/Login/LoginRequired";
 
 import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";

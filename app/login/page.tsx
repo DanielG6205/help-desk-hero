@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
-import GoogleLoginButton from "../components/fb/GoogleLoginButton";
-import EmailPasswordLogin from "../components/fb/EmailPasswordLogin";
+import GoogleLoginButton from "../../components/Login/GoogleLoginButton";
+import EmailPasswordLogin from "../../components/Login/EmailPasswordLogin";
 import Link from "next/link";
-import { useAuth } from "../components/fb/AuthContent";
-import LogoutButton from "../components/fb/LogoutButton";
+import { useAuth } from "../../components/fb/AuthContent";
+import LogoutButton from "../../components/Login/LogoutButton";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {

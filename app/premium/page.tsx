@@ -3,7 +3,7 @@
 import { useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../components/fb/AuthContent";
+import { useAuth } from "../../components/fb/AuthContent";
 import { db } from "@/lib/firebase";
 import { doc, setDoc } from "firebase/firestore";
 

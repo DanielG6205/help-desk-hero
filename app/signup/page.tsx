@@ -1,9 +1,9 @@
 "use client";
 
-import EmailPasswordSignup from "../components/fb/EmailPasswordSignup";
+import EmailPasswordSignup from "../../components/Login/EmailPasswordSignup";
 import Link from "next/link";
-import { useAuth } from "../components/fb/AuthContent";
-import LogoutButton from "../components/fb/LogoutButton";
+import { useAuth } from "../../components/fb/AuthContent";
+import LogoutButton from "../../components/Login/LogoutButton";
 
 export default function SignupPage() {
   const { user, loading } = useAuth();

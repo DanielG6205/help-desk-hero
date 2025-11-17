@@ -45,8 +45,12 @@ export default function EmailPasswordSignup() {
       // 5. Redirect
       router.push("/");
 
-    } catch (e: any) {
-      const friendly = errorMessages[e.code] || errorMessages["default"];
+    } catch (e: unknown) {
+      let code: string | undefined;
+      if (typeof e === "object" && e !== null && "code" in e) {
+        code = (e as { code?: string }).code;
+      }
+      const friendly = (code && errorMessages[code]) || errorMessages["default"];
       setError(friendly);
     }
   };

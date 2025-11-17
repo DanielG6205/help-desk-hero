@@ -4,9 +4,9 @@ import { useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { problems } from "../index";
 import { useCompletion } from "../../../lib/useCompletion";
-import { useAuth } from "@/app/components/fb/AuthContent";
-import LoginRequired from "@/app/components/fb/LoginRequired";
-import PremiumLocked from "@/app/components/PremiumLocked";
+import { useAuth } from "@/components/fb/AuthContent";
+import LoginRequired from "@/components/Login/LoginRequired";
+import PremiumLocked from "@/components/PremiumLocked";
 import { usePremium } from "@/lib/usePremium";
 
 export default function ProblemDetail() {
@@ -80,7 +80,7 @@ export default function ProblemDetail() {
               src={
                 problem.image.startsWith("/")
                   ? problem.image
-                  : `/${problem.image}`
+                  : `/labs/${problemId}/${problemId}.png`
               }
               alt={`${problem.name} preview`}
               className="w-full rounded-lg border border-white/10 object-cover max-h-96"

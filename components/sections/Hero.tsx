@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 
-import LogoLoop from "@/components/LogoLoop";
+import LogoLoop from "@/components/LogoLoop/LogoLoop";
 import {
   SiReact,
   SiFirebase,

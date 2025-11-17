@@ -33,7 +33,7 @@ export default function Navbar() {
 
         {/* Logo */}
         <Link href="/" className="block">
-          <img src="/help-logo.svg" alt="HelpDeskHero Logo" className="h-14 w-auto" />
+          <img src="/logo/help-logo.svg" alt="HelpDeskHero Logo" className="h-14 w-auto" />
         </Link>
 
         <div className="hidden md:flex gap-10 text-gray-200 items-center">

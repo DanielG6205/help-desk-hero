@@ -1,7 +1,7 @@
 "use client";
 
-import { useAuth } from "@/app/components/fb/AuthContent";
-import LoginRequired from "@/app/components/fb/LoginRequired";
+import { useAuth } from "@/components/fb/AuthContent";
+import LoginRequired from "@/components/Login/LoginRequired";
 import { useCompletion } from "@/lib/useCompletion";
 import { problems } from "../labs/index";
 import { useEffect, useState } from "react";

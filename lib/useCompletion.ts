@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { db } from "@/lib/firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { useAuth } from "@/app/components/fb/AuthContent";
+import { useAuth } from "@/components/fb/AuthContent";
 import { usePremium } from "@/lib/usePremium";
 import { updateStreak } from "@/lib/updateStreak";
 

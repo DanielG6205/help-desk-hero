@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { useAuth } from "@/app/components/fb/AuthContent";
+import { useAuth } from "@/components/fb/AuthContent";
 
 export function usePremium() {
   const { user } = useAuth();
