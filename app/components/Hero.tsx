@@ -16,52 +16,31 @@ import {
 
 const techLogos = [
   { node: <SiReact />, title: "React", href: "https://react.dev" },
-
   { node: <SiVercel />, title: "Vercel", href: "https://vercel.com" },
   { node: <SiNextdotjs />, title: "Next.js", href: "https://nextjs.org" },
-  {
-    node: <SiFigma />,
-    title: "Figma",
-    href: "https://www.figma.com",
-  },
-  {
-    node: <SiFirebase />,
-    title: "Firebase",
-    href: "https://firebase.google.com",
-  },
-  {
-    node: <SiTypescript />,
-    title: "TypeScript",
-    href: "https://www.typescriptlang.org",
-  },
-
-  {
-    node: <SiTailwindcss />,
-    title: "Tailwind CSS",
-    href: "https://tailwindcss.com",
-  },
+  { node: <SiFigma />, title: "Figma", href: "https://www.figma.com" },
+  { node: <SiFirebase />, title: "Firebase", href: "https://firebase.google.com" },
+  { node: <SiTypescript />, title: "TypeScript", href: "https://www.typescriptlang.org" },
+  { node: <SiTailwindcss />, title: "Tailwind CSS", href: "https://tailwindcss.com" },
 ];
-/**
- * Scroll‑linked Hero section.
- *
- * Effects:
- * - First two lines ("Practice helpdesk work. Troubleshoot real computers.") fade + blur out as user scrolls.
- * - Supporting paragraph fades + blurs out in sync with them.
- * - "Be a Hero" stays pinned (via sticky) and moves slightly (subtle translate) until end of hero section.
- * - Tagline + buttons move upward (parallax) while divider line remains visually stable.
- * - Animation progress clamps 0 → 1 over the scrollable portion (hero height - viewport height).
- * - Respects prefers-reduced-motion (disables transitions / blurs).
- */
+
 export default function Hero() {
   const heroRef = useRef<HTMLElement | null>(null);
   const [progress, setProgress] = useState(0); // 0 → 1 normalized
-  // Detect reduced motion preference (evaluated client-side each render)
+  const [isShort, setIsShort] = useState(false); // short viewport mode
   const reduceMotion =
     typeof window !== "undefined" &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   useEffect(() => {
-    // (Removed reduced motion ref assignment; now computed directly in render)
+    // Short viewport detection (re-run on resize/rotate)
+    function measure() {
+      // Tunable threshold: treat < 760px as “short”
+      setIsShort(window.innerHeight < 760);
+    }
+    measure();
+    window.addEventListener("resize", measure);
+    window.addEventListener("orientationchange", measure);
 
     function computeProgress() {
       if (!heroRef.current) return 0;
@@ -70,11 +49,8 @@ export default function Hero() {
       const heroHeight = el.offsetHeight;
       const viewportHeight = window.innerHeight;
       const scrollY = window.scrollY;
-      // Portion where sticky is active: heroHeight - viewportHeight
       const scrollable = Math.max(heroHeight - viewportHeight, 1);
-
       const raw = (scrollY - heroTop) / scrollable;
-      console.log(raw);
       return Math.min(1, Math.max(0, raw));
     }
 
@@ -89,19 +65,14 @@ export default function Hero() {
       });
     }
 
-    function onResize() {
-      // Trigger recalculation after layout changes
-      onScroll();
-    }
-
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onResize);
     // Initial set
     onScroll();
 
     return () => {
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onResize);
+      window.removeEventListener("resize", measure);
+      window.removeEventListener("orientationchange", measure);
     };
   }, []);
 
@@ -116,7 +87,6 @@ export default function Hero() {
   const parallaxRise = progress * 60; // px upward movement for tagline/buttons
   const dividerOpacity = 1 - progress * 0.25; // Keep strong but slight dim near end
 
-  // Clamp helpers
   const clamp01 = (v: number) => Math.min(1, Math.max(0, v));
 
   const headingStyle: React.CSSProperties = reduceMotion
@@ -153,17 +123,32 @@ export default function Hero() {
         transform: `translateY(${(-parallaxRise).toFixed(2)}px)`,
       };
 
-  const carouselStyle: React.CSSProperties = reduceMotion
+  const carouselTransformStyle: React.CSSProperties = reduceMotion
     ? {}
     : {
         opacity: lastFadeIn,
         transform: `translateY(${(-parallaxRise).toFixed(2)}px)`,
       };
 
+  // Carousel sizing/padding based on viewport height
+  const carouselHeightPx = isShort ? 56 : 84; // reserve space when absolute
+  const carouselProps = {
+    speed: isShort ? 45 : 60,
+    direction: "left" as const,
+    logoHeight: isShort ? 36 : 48,
+    gap: isShort ? 36 : 60,
+    hoverSpeed: 0,
+    scaleOnHover: !isShort,
+    ariaLabel: "Technology partners",
+  };
+
   return (
     <section
       ref={heroRef}
-      className="relative w-full h-[170vh] bg-black text-white overflow-visible"
+      // Use svh for mobile browser chrome stability; reserve space for absolute carousel with pb
+      className={`relative w-full bg-black text-white overflow-visible ${
+        isShort ? "h-[140svh]" : "h-[170svh]"
+      }`}
       aria-label="Hero Section"
     >
       {/* Background Image */}
@@ -182,25 +167,28 @@ export default function Hero() {
 
       {/* Sticky viewport frame */}
       <div
-        className="sticky top-0 h-screen flex flex-col justify-center px-10 md:px-24 lg:px-32 transition-[transform] duration-300"
+        className={` sticky top-0 h-[100svh] flex flex-col justify-center px-10 md:px-24 lg:px-32 transition-[transform] duration-300 ${
+          // Reserve bottom padding ONLY when the carousel is absolute so CTAs never collide
+          isShort ? "" : `pb-[${carouselHeightPx + 24}px]`
+        }`}
         style={miniSectionStyle}
       >
         {/* Headings block */}
-        <div className="w-full">
+        <div className="mt-20 w-full">
           <h1
-            className="text-6xl md:text-7xl font-extrabold tracking-tight drop-shadow-lg leading-[1.08] transition-[opacity,transform,filter] duration-300"
+            className="text-5xl md:text-7xl font-extrabold tracking-tight drop-shadow-lg leading-[1.08] transition-[opacity,transform,filter] duration-300"
             style={headingStyle}
           >
-            Practice helpdesk work.
+            Practice help desk work.
           </h1>
           <h1
-            className="text-6xl md:text-7xl font-extrabold tracking-tight drop-shadow-lg leading-[1.08] mt-2 transition-[opacity,transform,filter] duration-300"
+            className="text-5xl md:text-7xl font-extrabold tracking-tight drop-shadow-lg leading-[1.08] mt-2 transition-[opacity,transform,filter] duration-300"
             style={headingStyle}
           >
             Troubleshoot real computers.
           </h1>
           <h1
-            className="text-6xl md:text-7xl font-extrabold tracking-tight drop-shadow-lg leading-[1.08] mt-4 will-change-transform transition-transform duration-300"
+            className="text-5xl md:text-7xl font-extrabold tracking-tight drop-shadow-lg leading-[1.08] mt-4 will-change-transform transition-transform duration-300"
             style={pinnedHeroStyle}
           >
             Be a{" "}
@@ -209,7 +197,7 @@ export default function Hero() {
             </span>
           </h1>
 
-          {/* Divider + secondary content (divider remains visually centered) */}
+          {/* Divider + secondary content */}
           <div
             className="mt-10 w-full border-t border-white/70 transition-opacity duration-300"
             style={{ opacity: clamp01(dividerOpacity) }}
@@ -217,7 +205,7 @@ export default function Hero() {
         </div>
 
         <div className="mt-6 w-full flex flex-col md:flex-row md:items-start md:justify-between gap-8">
-          {/* Tagline (kept uppercase as focal anchor under pinned heading) */}
+          {/* Tagline */}
           <div className="flex-1">
             <span className="block uppercase text-[12px] md:text-[13px] tracking-[0.18em] font-medium text-white/70">
               Real systems + real troubleshooting
@@ -234,18 +222,19 @@ export default function Hero() {
                 className="text-[16px] md:text-[17px] leading-relaxed text-white/85 max-w-xl transition-[opacity,transform,filter] duration-300 text-left md:text-right"
                 style={paragraphStyle}
               >
-                Help Desk Hero isn’t a simulation. It’s hands‑on training with
+                Help Desk Hero isn’t a simulation. It’s hands-on training with
                 real virtual machines where you diagnose, repair, and learn by
                 doing.
               </p>
 
-              <div className="mt-6 flex items-center gap-4">
-                <button
+              <div className="mt-6 flex items-center gap-4 relative z-20">
+                <Link
+                  href="/learn"
                   className="px-6 py-3 rounded-xl font-medium text-white bg-transparent border border-white/30 hover:border-white/60 backdrop-blur-[2px] transition-colors duration-200"
                   aria-label="Learn concepts"
                 >
                   Learn concepts
-                </button>
+                </Link>
                 <Link
                   href="/labs"
                   className="px-8 py-3 rounded-xl font-semibold text-black bg-teal-300 hover:bg-teal-400 hover:shadow-[0_0_18px_#14b8a6] transition-all duration-200"
@@ -257,39 +246,34 @@ export default function Hero() {
             </div>
           </div>
         </div>
+
+        {/* SHORT VIEWPORT: render carousel IN FLOW (no overlap, smaller) */}
+        {isShort && (
+          <div className="mt-10 z-10" style={carouselTransformStyle}>
+            <p className="text-[10px] uppercase tracking-[0.28em] text-white/60 mb-2">
+              Made with:
+            </p>
+            <div className="w-full overflow-hidden">
+              <LogoLoop {...carouselProps} logos={techLogos} />
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* TALLER VIEWPORT: keep carousel visually pinned at bottom, but never block clicks */}
+      {!isShort && (
         <div
-          className="absolute inset-x-0 bottom-0 px-10 md:px-24 lg:px-32 pb-10 z-10 transition-[opacity,transform] duration-300"
-          style={carouselStyle}
+          className="absolute inset-x-0 bottom-0 px-10 md:px-24 lg:px-32 pb-6 z-10 transition-[opacity,transform] duration-300 pointer-events-none"
+          style={carouselTransformStyle}
         >
           <p className="text-xs uppercase tracking-[0.28em] text-white/60 mb-3">
             Made with:
           </p>
           <div className="w-full overflow-hidden">
-            <LogoLoop
-              logos={techLogos}
-              speed={60}
-              direction="left"
-              logoHeight={48}
-              gap={60}
-              hoverSpeed={0}
-              scaleOnHover
-              ariaLabel="Technology partners"
-            />
+            <LogoLoop {...carouselProps} logos={techLogos} />
           </div>
         </div>
-      </div>
+      )}
     </section>
   );
 }
-
-/* Tailwind helper animation (already used in original code).
-   If not defined globally, include below in a CSS file:
-   .animate-gradient-x {
-     animation: gradientMove 10s linear infinite;
-     background-size: 200% auto;
-   }
-   @keyframes gradientMove {
-     0% { background-position: 0% 50%; }
-     100% { background-position: 200% 50%; }
-   }
- */
