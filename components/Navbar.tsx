@@ -9,6 +9,7 @@ import { auth } from "@/lib/firebase";
 export default function Navbar() {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
+  const [lbOpen, setLbOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const getFirstName = () => {
@@ -38,30 +39,32 @@ export default function Navbar() {
 
         <div className="hidden md:flex gap-10 text-gray-200 items-center">
 
-          {/* Leaderboards Dropdown with Hover Bridge */}
-          <div className="relative group">
-            <button className="hover:text-teal-300 hover:drop-shadow-[0_0_8px_#14b8a6] transition-all">
-              Leaderboards
-            </button>
+          {/* Leaderboards Dropdown (use React hover state for reliability) */}
+          <div
+            className="relative"
+            onMouseEnter={() => setLbOpen(true)}
+            onMouseLeave={() => setLbOpen(false)}
+          >
+            {/* Invisible larger hit area so users can more easily hover the menu */}
+            <div className="relative inline-block">
+              <span className="absolute -inset-3 pointer-events-auto bg-transparent" aria-hidden="true"></span>
+              <button className="relative z-10 hover:text-teal-300 hover:drop-shadow-[0_0_8px_#14b8a6] transition-all">
+                Leaderboards
+              </button>
+            </div>
 
-            {/* Invisible hover area under the button */}
-            <div className="absolute left-0 top-full w-full h-4 bg-transparent pointer-events-auto"></div>
-
-            {/* Dropdown */}
+            {/* Dropdown (visibility controlled by `lbOpen`) */}
             <div
-              className="
-                absolute left-0 mt-2 w-40 bg-white text-black rounded-xl shadow-xl 
-                border border-gray-200
-                opacity-0 pointer-events-none
-                group-hover:opacity-100 group-hover:pointer-events-auto
-                transition-all duration-150
-              "
+              className={
+                `absolute left-0 mt-2 w-40 bg-white text-black rounded-xl shadow-xl border border-gray-200 transition-all duration-150 ` +
+                (lbOpen ? 'opacity-100 pointer-events-auto z-50' : 'opacity-0 pointer-events-none')
+              }
             >
-              <Link href="/leaderboard" className="block px-4 py-2 hover:bg-gray-100 transition">
+              <Link href="/leaderboard" className="block px-4 py-2 hover:bg-gray-100 hover:text-teal-600 transform hover:translate-x-1 transition-all duration-150">
                 Leaderboard
               </Link>
 
-              <Link href="/streakboard" className="block px-4 py-2 hover:bg-gray-100 transition">
+              <Link href="/streakboard" className="block px-4 py-2 hover:bg-gray-100 hover:text-teal-600 transform hover:translate-x-1 transition-all duration-150">
                 Streakboard
               </Link>
             </div>
@@ -88,18 +91,18 @@ export default function Navbar() {
 
               {open && (
                 <div className="absolute right-0 mt-2 w-40 bg-white text-black rounded-xl shadow-xl border border-gray-200 overflow-hidden">
-                  <Link href="/account" className="block px-4 py-2 hover:bg-gray-100 transition" onClick={() => setOpen(false)}>
+                  <Link href="/account" className="block px-4 py-2 hover:bg-gray-100 hover:text-teal-600 transform hover:translate-x-1 transition-all duration-150" onClick={() => setOpen(false)}>
                     Profile
                   </Link>
-                  <Link href="/settings" className="block px-4 py-2 hover:bg-gray-100 transition" onClick={() => setOpen(false)}>
+                  <Link href="/settings" className="block px-4 py-2 hover:bg-gray-100 hover:text-teal-600 transform hover:translate-x-1 transition-all duration-150" onClick={() => setOpen(false)}>
                     Settings
                   </Link>
-                  <Link href="/premium" className="block px-4 py-2 hover:bg-gray-100 transition" onClick={() => setOpen(false)}>
+                  <Link href="/premium" className="block px-4 py-2 hover:bg-gray-100 hover:text-teal-600 transform hover:translate-x-1 transition-all duration-150" onClick={() => setOpen(false)}>
                     Upgrade
                   </Link>
                   <button
                     onClick={() => { signOut(auth); setOpen(false); }}
-                    className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 transition"
+                    className="w-full text-left px-4 py-2 text-red-600 hover:bg-gray-100 hover:text-red-700 transform hover:translate-x-1 transition-all duration-150"
                   >
                     Logout
                   </button>
