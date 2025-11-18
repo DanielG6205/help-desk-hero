@@ -39,6 +39,7 @@ export default function PricingFiveCards() {
         { plan, planUpdatedAt: new Date().toISOString() },
         { merge: true }
       );
+
       alert(
         plan === "free"
           ? "Free plan activated."
@@ -50,6 +51,7 @@ export default function PricingFiveCards() {
           ? "Team plan activated!"
           : "Business plan selected!"
       );
+
       router.push("/account");
     },
     [router, user]
@@ -131,11 +133,11 @@ export default function PricingFiveCards() {
     },
   ];
 
-  // Which order? Free (center/front), Monthly + Yearly (middle), Teams + Business (back)
-  // We’ll simply render 5 cards in a row; the “bring to top” happens via hover (z-50 + scale).
   return (
     <div className="min-h-screen pt-24 px-6 bg-neutral-950 text-white">
       <div className="max-w-7xl mx-auto">
+
+        {/* HEADER */}
         <header className="text-center mb-12">
           <h1 className="text-5xl font-bold mb-3 bg-gradient-to-r from-teal-300 to-blue-400 text-transparent bg-clip-text">
             Choose Your Plan
@@ -145,92 +147,99 @@ export default function PricingFiveCards() {
           </p>
         </header>
 
-        {/* Five-card strip like your image; hover lifts to top */}
-        <div
-          className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6"
-          aria-label="Pricing cards"
-        >
-          {plans.map((p, idx) => (
-            <div
-              key={p.key}
-              className={[
-                "group relative overflow-hidden rounded-xl border border-white/10",
-                "bg-gradient-to-b from-white/10 to-white/[0.06] backdrop-blur",
-                "shadow-[0_10px_30px_rgba(0,0,0,0.35)]",
-                "transition-all duration-300 ease-out",
-                "hover:scale-[1.03] hover:-translate-y-1 hover:z-50 hover:shadow-[0_18px_60px_rgba(0,0,0,0.55)]",
-                "focus-within:scale-[1.03] focus-within:-translate-y-1 focus-within:z-50",
-              ].join(" ")}
-              style={{
-                // subtle default stacking so Free (middle) feels forward on XL
-                zIndex: [2, 1, 2, 0, 0][idx],
-              }}
-            >
-              {/* header gradient like the image */}
+        {/* 5 CARD LAYOUT */}
+        <div className="grid grid-cols-1 md:grid-cols- xl:grid-cols-5 gap-6 group overflow-visible">
+
+          {plans.map((p, idx) => {
+            const baseScales = [
+              "scale-[0.90]",
+              "scale-[0.95]",
+              "scale-[1.00]", // center & BEST VALUE
+              "scale-[0.95]",
+              "scale-[0.90]",
+            ];
+
+            const baseZ = [5, 10, 20, 10, 5];
+
+            return (
               <div
-                className={`relative h-24 flex items-center justify-between px-5 bg-gradient-to-r ${p.headerGrad}`}
+                key={p.key}
+                className={[
+                  "relative rounded-xl border border-white/10",
+                  "bg-gradient-to-b from-white/10 to-white/[0.06] backdrop-blur",
+                  "transition-all duration-300 ease-out",
+
+                  baseScales[idx],
+
+                  // hover
+                  "hover:scale-[1.05] hover:z-50",
+                  "group-hover:[&:not(:hover)]:opacity-60",
+                  "group-hover:[&:not(:hover)]:scale-[0.90]",
+                ].join(" ")}
+                style={{ zIndex: baseZ[idx] }}
               >
-                <h3 className="text-xl font-bold tracking-wide">{p.title}</h3>
-                <div className="flex items-end gap-1">
-                  <span className="text-4xl font-extrabold">{p.priceMain}</span>
-                  {p.priceSub ? (
-                    <span className="text-sm mb-1 opacity-90">{p.priceSub}</span>
-                  ) : null}
+
+                {/* ⭐ NEW HEADER STYLE */}
+                <div className="flex flex-col items-center text-center px-5 py-6 bg-gradient-to-r from-white/10 to-white/0">
+                  
+                  {/* Tier name */}
+                  <h3 className="text-xl font-bold tracking-wide mb-2">
+                    {p.title}
+                  </h3>
+
+                  {/* Price */}
+                  <div className="text-2xl font-extrabold">
+                    {p.priceMain}
+                    {p.priceSub && (
+                      <span className="text-lg ml-1 opacity-80">{p.priceSub}</span>
+                    )}
+                  </div>
+
+                  {/* BEST VALUE badge (centered) */}
+                  {p.badge && (
+                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded">
+                      {p.badge}
+                    </span>
+                  )}
                 </div>
 
-                {p.badge ? (
-                  <span className="absolute -top-3 left-3 bg-yellow-400 text-black text-xs font-bold px-2 py-1 rounded">
-                    {p.badge}
-                  </span>
-                ) : null}
+                {/* BODY */}
+                <div className="px-6 py-6">
+                  {p.subtitle && (
+                    <p className="text-gray-300 text-sm mb-4">{p.subtitle}</p>
+                  )}
+
+                  <ul className="space-y-3 text-sm">
+                    {p.features.map((f, i) => (
+                      <li key={i} className="flex items-start gap-3">
+                        <span className={f.ok ? "text-teal-400 w-4" : "text-gray-500 w-4"}>
+                          {f.ok ? "✔" : "✘"}
+                        </span>
+                        <span className={f.ok ? "text-gray-100" : "text-gray-400"}>
+                          {f.label}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <button
+                    onClick={p.onClick ? p.onClick : () => upgrade(p.key)}
+                    className="mt-6 w-full rounded-md bg-teal-600 hover:bg-teal-700 py-2.5 font-semibold"
+                  >
+                    {p.cta}
+                  </button>
+                </div>
               </div>
-
-              {/* body */}
-              <div className="px-6 py-6">
-                {p.subtitle ? (
-                  <p className="text-gray-300 text-sm mb-4">{p.subtitle}</p>
-                ) : null}
-
-                <ul className="space-y-3 text-sm">
-                  {p.features.map((f, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <span
-                        className={
-                          f.ok
-                            ? "mt-0.5 inline-block w-4 text-teal-400"
-                            : "mt-0.5 inline-block w-4 text-gray-500"
-                        }
-                      >
-                        {f.ok ? "✔" : "✘"}
-                      </span>
-                      <span className={f.ok ? "text-gray-100" : "text-gray-400"}>
-                        {f.label}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-
-                <button
-                  onClick={
-                    p.onClick
-                      ? p.onClick
-                      : () => upgrade(p.key) // default to writing plan
-                  }
-                  className="mt-6 w-full rounded-md bg-teal-600 hover:bg-teal-700 py-2.5 font-semibold"
-                >
-                  {p.cta}
-                </button>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
-        {/* Mini comparison (only what you asked) */}
+        {/* MINI TABLE */}
         <div className="mt-12">
           <div className="overflow-x-auto rounded-xl border border-white/10 bg-white/5">
             <table className="min-w-full text-sm">
               <thead className="bg-white/5">
-                <tr className="[&>th]:px-4 [&>th]:py-3 text-left">
+                <tr className="[&>th]:px-4 [&>th]:py-3">
                   <th>Perk</th>
                   <th className="text-center">Free</th>
                   <th className="text-center">Monthly</th>
@@ -239,7 +248,7 @@ export default function PricingFiveCards() {
                   <th className="text-center">Business</th>
                 </tr>
               </thead>
-              <tbody className="[&>tr>*]:px-4 [&>tr>*]:py-3 divide-y divide-white/10">
+              <tbody className="divide-y divide-white/10 [&>tr>*]:px-4 [&>tr>*]:py-3">
                 <tr>
                   <td className="font-medium">All Labs</td>
                   <td className="text-center">✘</td>
@@ -265,16 +274,12 @@ export default function PricingFiveCards() {
           </p>
         </div>
 
+        {/* FOOTER */}
         <footer className="mt-10 text-center text-gray-400">
           Questions?{" "}
-          <Link href="/contact-sales" className="underline">
-            Contact sales
-          </Link>{" "}
-          or{" "}
-          <Link href="/faq" className="underline">
-            read the FAQ
-          </Link>
-          .
+          <Link href="/contact-sales" className="underline">Contact sales</Link>
+          {" "}or{" "}
+          <Link href="/faq" className="underline">read the FAQ</Link>.
         </footer>
       </div>
     </div>
