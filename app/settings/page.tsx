@@ -5,14 +5,13 @@ import { updateProfile, deleteUser } from "firebase/auth";
 import { useAuth } from "@/components/fb/AuthContent";
 import LoginRequired from "@/components/Login/LoginRequired";
 import { auth } from "@/lib/firebase";
-import { useCompletion } from "@/lib/useCompletion";
+// Completion tracking temporarily disabled (Convex migration)
 
 import { motion, AnimatePresence } from "framer-motion";
 import { User, RefreshCcw, Trash2, ShieldAlert } from "lucide-react";
 
 export default function SettingsPage() {
   const { user, loading } = useAuth();
-  const { resetAll } = useCompletion();
 
   const [name, setName] = useState("");
   const [status, setStatus] = useState("");
@@ -41,13 +40,15 @@ export default function SettingsPage() {
   }
 
   async function handleResetProgress() {
-    try {
-      await resetAll();
-      setConfirmReset(false);
-      alert("All progress reset successfully!");
-    } catch (err) {
-      alert("Failed to reset progress.");
-    }
+    // Disabled during migration: no backend progress reset
+    // NOTE: This previously cleared user completion (doneIds), streak counters,
+    // and leaderboard stats stored in Firestore. During the Convex migration we
+    // removed remote persistence, so triggering a reset now would only provide
+    // misleading feedback (there is no server state to modify). Once Convex
+    // progress + streak + leaderboard mutations are implemented, replace this
+    // placeholder with a real mutation call (e.g. api.progress.resetAll).
+    setConfirmReset(false);
+    alert("Progress reset is temporarily disabled during migration to Convex.");
   }
 
   async function handleDeleteAccount() {
@@ -61,7 +62,6 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-[#0a0f1f] to-black text-white px-6 pt-24">
-
       {/* GLASS CARD */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -78,7 +78,9 @@ export default function SettingsPage() {
 
         {/* DISPLAY NAME */}
         <div className="mb-8">
-          <label className="block text-lg font-semibold mb-2">Display Name</label>
+          <label className="block text-lg font-semibold mb-2">
+            Display Name
+          </label>
           <input
             className="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/20 outline-none text-white focus:ring-2 focus:ring-cyan-400 transition"
             value={name}
@@ -124,7 +126,9 @@ export default function SettingsPage() {
                 exit={{ opacity: 0 }}
                 className="bg-yellow-900/40 border border-yellow-600 p-5 rounded-xl"
               >
-                <p className="mb-4">Are you sure? This will erase all completed problems.</p>
+                <p className="mb-4">
+                  Are you sure? This will erase all completed problems.
+                </p>
 
                 <div className="flex gap-3">
                   <button
@@ -168,7 +172,10 @@ export default function SettingsPage() {
                 exit={{ opacity: 0 }}
                 className="bg-red-900/40 border border-red-600 p-5 rounded-xl"
               >
-                <p className="mb-4">This action is permanent. Your account and all data will be deleted.</p>
+                <p className="mb-4">
+                  This action is permanent. Your account and all data will be
+                  deleted.
+                </p>
 
                 <div className="flex gap-3">
                   <button

@@ -1,12 +1,9 @@
 "use client";
 
-import { useAuth } from "@/components/fb/AuthContent";
 import LoginRequired from "@/components/Login/LoginRequired";
-import { useCompletion } from "@/lib/useCompletion";
+// import { useCompletion } from "@/lib/useCompletion"; // Removed during Convex migration
 import { problems } from "../labs/index";
 import { useEffect, useState } from "react";
-import { collection, getDocs, getDoc, doc, setDoc } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import Link from "next/link";
 
 import { motion } from "framer-motion";
@@ -22,7 +19,7 @@ type LeaderboardEntry = {
 
 export default function AccountPage() {
   const { user, loading } = useAuth();
-  const { doneIds } = useCompletion();
+  // Completion tracking disabled during Convex migration (no doneIds state)
   const premium = usePremium();
 
   const [leaders, setLeaders] = useState<LeaderboardEntry[]>([]);
@@ -33,7 +30,7 @@ export default function AccountPage() {
   const [freezeUsedOn, setFreezeUsedOn] = useState<string | null>(null);
 
   const totalProblems = problems.length;
-  const solved = doneIds.size;
+  const solved = 0; // Static placeholder until Convex progress tracking is implemented
 
   // Load leaderboard + rank
   useEffect(() => {
@@ -53,7 +50,7 @@ export default function AccountPage() {
     }
 
     if (user) loadLeaderboard();
-  }, [user, doneIds]);
+  }, [user]);
 
   // Load streak & freeze
   useEffect(() => {
@@ -176,9 +173,7 @@ export default function AccountPage() {
           {rank ? (
             <p className="text-gray-300">
               You are currently{" "}
-              <span className="text-yellow-300 font-bold text-xl">
-                #{rank}
-              </span>{" "}
+              <span className="text-yellow-300 font-bold text-xl">#{rank}</span>{" "}
               out of {leaders.length} users.
             </p>
           ) : (
@@ -284,7 +279,7 @@ function PremiumStatus({ user }: { user: any }) {
         premium: "free",
         premiumUpdatedAt: new Date().toISOString(),
       },
-      { merge: true }
+      { merge: true },
     );
 
     setPremium("free");
