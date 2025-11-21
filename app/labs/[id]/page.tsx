@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo } from "react";
 import { useParams } from "next/navigation";
-import { problems } from "../index";
+
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
 
 /**
  * Static Lab Detail Page
@@ -25,19 +26,26 @@ export default function ProblemDetailStatic() {
   const params = useParams<{ id: string }>();
   const problemId = Number(params.id);
 
-  const problem = useMemo(
-    () => problems.find((p) => p.id === problemId),
-    [problemId],
-  );
+  const problem = useQuery(api.problems.getByNumber, { number: problemId });
+
+  if (problem === undefined) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black text-white">
+        <div className="text-center space-y-4">
+          <h1 className="text-3xl font-bold">Loading...</h1>
+        </div>
+      </div>
+    );
+  }
 
   if (!problem) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-black text-white">
         <div className="text-center space-y-4">
           <h1 className="text-3xl font-bold">Lab Not Found</h1>
+
           <p className="text-gray-400">
-            The requested lab ID ({problemId || "?"}) does not exist in the
-            static dataset.
+            The requested lab ID ({problemId || "?"}) does not exist.
           </p>
           <a
             href="/labs"

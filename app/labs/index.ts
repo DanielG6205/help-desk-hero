@@ -1,5 +1,4 @@
 export type Problem = {
-  id: number;
   name: string;
   difficulty: "Easy" | "Medium" | "Hard";
   premium: boolean;
@@ -18,7 +17,6 @@ export const problems: Problem[] = [
   // 🟢 EASY (3)
   // -------------------------------------------------
   {
-    id: 1,
     name: "Shared Folder Access – AD Group Permissions",
     difficulty: "Easy",
     premium: false,
@@ -55,7 +53,6 @@ export const problems: Problem[] = [
   },
 
   {
-    id: 2,
     name: "Printer Not Showing on Workstation",
     difficulty: "Easy",
     premium: false,
@@ -88,7 +85,6 @@ export const problems: Problem[] = [
   },
 
   {
-    id: 3,
     name: "Premium: Login Script Not Mapping Drives",
     difficulty: "Easy",
     premium: true,
@@ -125,7 +121,6 @@ export const problems: Problem[] = [
   // 🟡 MEDIUM (3)
   // -------------------------------------------------
   {
-    id: 4,
     name: "VPN Connection Failure",
     difficulty: "Medium",
     premium: false,
@@ -157,7 +152,6 @@ export const problems: Problem[] = [
   },
 
   {
-    id: 5,
     name: "Email Not Syncing on Outlook",
     difficulty: "Medium",
     premium: false,
@@ -188,7 +182,6 @@ export const problems: Problem[] = [
   },
 
   {
-    id: 6,
     name: "Premium: Multi-Site Login Failure – Replication Issue",
     difficulty: "Medium",
     premium: true,
@@ -224,7 +217,6 @@ export const problems: Problem[] = [
   // 🔴 HARD (3)
   // -------------------------------------------------
   {
-    id: 7,
     name: "Disk Space Critical – Server Cleanup",
     difficulty: "Hard",
     premium: false,
@@ -255,7 +247,6 @@ export const problems: Problem[] = [
   },
 
   {
-    id: 8,
     name: "GPO Not Applying – Policy Troubleshooting",
     difficulty: "Hard",
     premium: false,
@@ -263,7 +254,7 @@ export const problems: Problem[] = [
     serverRdpFile: "/rdp/8/server.rdp",
     workshopRdpFile: "/rdp/8/workstation.rdp",
     completionKey: "GPO888",
-    image:"",
+    image: "",
     labScenario: [
       "A workstation is missing mapped drives and restrictions.",
       "GPO inheritance or filtering might be broken.",
@@ -286,7 +277,6 @@ export const problems: Problem[] = [
   },
 
   {
-    id: 9,
     name: "Premium: Kerberos Authentication Failure – Ticket Debugging",
     difficulty: "Hard",
     premium: true,
@@ -294,7 +284,7 @@ export const problems: Problem[] = [
     serverRdpFile: "/rdp/9/server.rdp",
     workshopRdpFile: "/rdp/9/workstation.rdp",
     completionKey: "KRBOS777",
-    image:"",
+    image: "",
     labScenario: [
       "Users cannot access services requiring Kerberos.",
       "Event Viewer logs show KRB5 and ticket errors.",

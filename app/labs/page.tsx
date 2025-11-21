@@ -3,7 +3,9 @@
 import { useMemo, useState, useEffect } from "react";
 import Link from "next/link";
 import ProblemCard from "./ProblemCard";
-import { problems } from "./index";
+import { useQuery } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import type { Doc } from "@/convex/_generated/dataModel";
 
 // NOTE: All dynamic completion logic removed.
 // Static placeholders used instead until Convex integration is ready.
@@ -39,19 +41,25 @@ export default function ProblemsPage() {
     // setPremiumStatus("free");
   }, []);
 
+  const problemsData = useQuery(api.problems.list, {});
+
   // Static counts (no completion tracking yet)
+
   const counts = useMemo(
     () => ({
       done: 0, // No problems marked done (static)
-      not: problems.length,
-      all: problems.length,
+
+      not: problemsData?.length ?? 0,
+
+      all: problemsData?.length ?? 0,
     }),
-    [],
+
+    [problemsData],
   );
 
-  // Filter problems using static completion (none done)
   const filteredProblems = useMemo(() => {
-    return problems.filter((p) => {
+    const base = problemsData ?? [];
+    return base.filter((p) => {
       const diffOk =
         selectedDifficulty.length === 0 ||
         selectedDifficulty.includes(p.difficulty);
@@ -62,12 +70,12 @@ export default function ProblemsPage() {
 
       const statusOk =
         status === "all" ||
-        (status === "done" && false) || // always false (no completed items)
-        (status === "not_done" && true); // always true (all are not done)
+        (status === "done" && false) ||
+        (status === "not_done" && true);
 
       return diffOk && skillsOk && statusOk;
     });
-  }, [selectedDifficulty, selectedSkills, status]);
+  }, [problemsData, selectedDifficulty, selectedSkills, status]);
 
   // Generic toggle helper
   const toggleFilter = (
@@ -183,15 +191,22 @@ export default function ProblemsPage() {
         </h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {filteredProblems.map((problem) => {
+          {filteredProblems.map((problem: Doc<"problems">) => {
             // Static placeholders: no completion tracking yet
+
             const done = false;
+
             const isLocked = problem.premium && premiumStatus === "free";
+
+            // Determine stable numeric lab number based on full list ordering
+            const all = problemsData ?? [];
+            const idx = all.findIndex((p) => p._id === problem._id);
+            const number = idx >= 0 ? idx + 1 : 0;
 
             return (
               <Link
-                href={isLocked ? "/premium" : `/labs/${problem.id}`}
-                key={problem.id}
+                href={isLocked ? "/premium" : `/labs/${number}`}
+                key={problem._id}
               >
                 <ProblemCard
                   problem={problem}

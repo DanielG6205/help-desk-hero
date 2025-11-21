@@ -1,18 +1,17 @@
 "use client";
 
-import { Problem } from "./index";
+import type { Doc } from "@/convex/_generated/dataModel";
 
 export default function ProblemCard({
   problem,
   done,
   premiumStatus,
 }: {
-  problem: Problem;
+  problem: Doc<"problems">;
   done?: boolean;
   premiumStatus: "free" | "monthly" | "yearly";
 }) {
-  const isPremiumLocked =
-    problem.premium && !done && premiumStatus === "free";
+  const isPremiumLocked = problem.premium && !done && premiumStatus === "free";
 
   return (
     <div
@@ -31,8 +30,8 @@ export default function ProblemCard({
               problem.difficulty === "Easy"
                 ? "text-green-300"
                 : problem.difficulty === "Medium"
-                ? "text-yellow-300"
-                : "text-red-400"
+                  ? "text-yellow-300"
+                  : "text-red-400"
             }`}
           >
             {problem.difficulty}
