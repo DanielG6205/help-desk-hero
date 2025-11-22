@@ -10,6 +10,7 @@
 
 import type * as problems from "../problems.js";
 import type * as seedProblems from "../seedProblems.js";
+import type * as users from "../users.js";
 
 import type {
   ApiFromModules,
@@ -20,6 +21,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   problems: typeof problems;
   seedProblems: typeof seedProblems;
+  users: typeof users;
 }>;
 
 /**

@@ -1,42 +1,26 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { updateProfile, deleteUser } from "firebase/auth";
-import { useAuth } from "@/components/fb/AuthContent";
-import LoginRequired from "@/components/Login/LoginRequired";
-import { auth } from "@/lib/firebase";
+
 // Completion tracking temporarily disabled (Convex migration)
 
 import { motion, AnimatePresence } from "framer-motion";
 import { User, RefreshCcw, Trash2, ShieldAlert } from "lucide-react";
+import { useAuth } from "@workos-inc/authkit-nextjs/components";
 
 export default function SettingsPage() {
   const { user, loading } = useAuth();
 
-  const [name, setName] = useState("");
   const [status, setStatus] = useState("");
 
   const [confirmReset, setConfirmReset] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
-  useEffect(() => {
-    if (user?.displayName) setName(user.displayName);
-  }, [user]);
-
   if (loading) return null;
-  if (!user) return <LoginRequired />;
+  // if (!user) return <LoginRequired />;
 
   async function save() {
     setStatus("");
-
-    try {
-      await updateProfile(auth.currentUser!, {
-        displayName: name.trim(),
-      });
-      setStatus("success");
-    } catch (err: any) {
-      setStatus(err.message || "Failed to update name.");
-    }
   }
 
   async function handleResetProgress() {
@@ -49,15 +33,6 @@ export default function SettingsPage() {
     // placeholder with a real mutation call (e.g. api.progress.resetAll).
     setConfirmReset(false);
     alert("Progress reset is temporarily disabled during migration to Convex.");
-  }
-
-  async function handleDeleteAccount() {
-    try {
-      await deleteUser(auth.currentUser!);
-      alert("Your account has been deleted.");
-    } catch (err: any) {
-      alert(err.message || "Failed to delete account.");
-    }
   }
 
   return (
@@ -81,12 +56,7 @@ export default function SettingsPage() {
           <label className="block text-lg font-semibold mb-2">
             Display Name
           </label>
-          <input
-            className="w-full px-4 py-3 rounded-xl bg-black/50 border border-white/20 outline-none text-white focus:ring-2 focus:ring-cyan-400 transition"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Enter your name..."
-          />
+          <p>{user?.firstName + " " + user?.lastName}</p>
 
           {/* STATUS FEEDBACK */}
           {status === "success" && (
@@ -95,13 +65,6 @@ export default function SettingsPage() {
           {status && status !== "success" && (
             <p className="mt-3 text-red-400">{status}</p>
           )}
-
-          <button
-            onClick={save}
-            className="mt-5 px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 transition font-semibold shadow-lg hover:shadow-blue-700/40"
-          >
-            Save Changes
-          </button>
         </div>
 
         {/* PROGRESS RESET */}
@@ -178,13 +141,6 @@ export default function SettingsPage() {
                 </p>
 
                 <div className="flex gap-3">
-                  <button
-                    onClick={handleDeleteAccount}
-                    className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-xl font-semibold"
-                  >
-                    Yes, Delete
-                  </button>
-
                   <button
                     onClick={() => setConfirmDelete(false)}
                     className="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-xl"

@@ -21,4 +21,9 @@ export default defineSchema({
     expectedOutcome: v.array(v.string()),
     instructions: v.array(v.string()),
   }),
+  users: defineTable({
+    name: v.string(),
+    tokenIdentifier: v.string(),
+    problemsCompleted: v.array(v.id("problems")),
+  }).index("by_token", ["tokenIdentifier"]),
 });
